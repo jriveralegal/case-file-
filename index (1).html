@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rivera v. LCSO — Official Case Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+:root{--nv:#0a1628;--cr:#7a0000;--gd:#c9a84c;--ow:#f8f6f1;--lg:#edeae3;--mg:#777;
+  --urgent-c:#7a0000;--overdue-c:#9b3000;--ready-c:#1a6b00;--sent-c:#005a99;
+  --pending-c:#555;--draft-c:#6b4400;--ev-c:#4a0000;--crit-c:#5a0000;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Source Serif 4',Georgia,serif;background:var(--ow);color:var(--nv)}
+/* HEADER */
+.hdr{background:var(--nv);border-bottom:3px solid var(--gd);position:sticky;top:0;z-index:200;box-shadow:0 4px 24px rgba(0,0,0,.5)}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;gap:16px;flex-wrap:wrap}
+.htitle{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:white;line-height:1.2}
+.htitle span{color:var(--gd)}
+.hsub{font-family:'DM Mono',monospace;font-size:9.5px;color:#99aacc;margin-top:3px;letter-spacing:.3px}
+.sol-box{background:var(--cr);border:1px solid rgba(201,168,76,.4);border-radius:8px;padding:10px 16px;text-align:center;flex-shrink:0}
+.sol-lbl{font-family:'DM Mono',monospace;font-size:8.5px;color:rgba(255,255,255,.7);letter-spacing:1px}
+.sol-clk{font-family:'DM Mono',monospace;font-size:12px;color:#ffcc00;letter-spacing:.5px;margin:3px 0}
+/* BANNER */
+.banner{background:linear-gradient(135deg,#7a0000,#9b0000);color:white;padding:9px 28px;font-family:'DM Mono',monospace;font-size:10.5px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-bottom:2px solid var(--gd)}
+.banner b{color:var(--gd);font-size:11.5px}
+.glink{color:var(--gd);text-decoration:none;font-weight:500}
+/* DEADLINE DASHBOARD */
+.ddash{background:white;border-bottom:2px solid var(--lg);padding:16px 28px}
+.ddash-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.5px;color:var(--mg);text-transform:uppercase;margin-bottom:10px}
+.dd-grid{display:flex;flex-wrap:wrap;gap:8px}
+.dd-card{border-radius:6px;padding:8px 12px;min-width:160px;flex:1;max-width:240px}
+.dd-card.critical{background:#3a0000;color:white}
+.dd-card.urgent{background:#fff0f0;border:1.5px solid var(--cr)}
+.dd-card.overdue{background:#fff5ee;border:1.5px solid #9b3000}
+.dd-card.warning{background:#fffaf0;border:1.5px solid #c9a84c}
+.dd-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.3px;margin-bottom:3px}
+.dd-card.critical .dd-label{color:#ffcc00}
+.dd-card.urgent .dd-label{color:var(--cr)}
+.dd-card.overdue .dd-label{color:#9b3000}
+.dd-timer{font-family:'DM Mono',monospace;font-size:11px;font-weight:500}
+.dd-note{font-family:'Source Serif 4',serif;font-size:9.5px;color:#666;margin-top:2px;font-style:italic}
+.dd-card.critical .dd-note{color:#ffaaaa}
+/* STATS */
+.stats{display:flex;flex-wrap:wrap;gap:1px;background:var(--lg)}
+.scard{background:white;padding:12px 16px;flex:1;min-width:100px;text-align:center}
+.sn{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;line-height:1}
+.sl{font-family:'DM Mono',monospace;font-size:8.5px;color:var(--mg);margin-top:2px;letter-spacing:.3px}
+/* CONTROLS */
+.ctrl{padding:12px 28px;background:white;border-bottom:1px solid var(--lg);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.srch{flex:1;min-width:180px;padding:7px 12px;border:1.5px solid var(--lg);border-radius:6px;font-family:'DM Mono',monospace;font-size:11px;background:var(--ow)}
+.srch:focus{outline:none;border-color:var(--gd)}
+.fb{padding:6px 12px;border:1.5px solid var(--lg);background:white;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;font-size:9.5px;color:var(--nv);transition:.15s}
+.fb:hover,.fb.active{background:var(--nv);color:white;border-color:var(--nv)}
+/* VERSION */
+.ver{background:var(--nv);color:#445;font-family:'DM Mono',monospace;font-size:9px;padding:4px 28px;letter-spacing:.3px}
+/* TABLE */
+.wrap{padding:18px 28px}
+table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.08)}
+th{background:var(--nv);color:white;padding:9px 10px;font-family:'DM Mono',monospace;font-size:9.5px;text-align:left;letter-spacing:.3px}
+td{padding:9px 10px;font-size:11px;vertical-align:top;border-bottom:1px solid var(--lg)}
+.sec-hdr td{background:#1a3a5c;color:white;font-family:'DM Mono',monospace;font-weight:700;font-size:11.5px;padding:9px 12px;letter-spacing:.4px}
+.drow:hover td{background:rgba(10,22,40,.02)}
+.idcell{font-family:'DM Mono',monospace;font-weight:500;font-size:10px;white-space:nowrap;width:48px}
+.tcell{min-width:180px}
+.dtitle{font-weight:600;font-size:11.5px;margin-bottom:3px}
+.ddesc{color:#666;font-size:10px;line-height:1.5}
+.datecell{text-align:center;min-width:100px;font-family:'DM Mono',monospace;font-size:9.5px}
+.dsent{color:var(--mg);margin-bottom:3px}
+.dlbl{font-size:8px;color:var(--mg);text-transform:uppercase;letter-spacing:.3px}
+.dval{font-weight:500}
+.dtimer{font-size:9px;margin-top:3px;padding:2px 5px;border-radius:3px;font-family:'DM Mono',monospace}
+/* OLD-TIMER-START */.dtimer.green{background:#e8ffe8;color:#1a6b00}
+.dtimer.yellow{background:#fffae8;color:#7a6000}
+.dtimer.red{background:#ffe8e8;color:#7a0000}
+.dtimer.overdue{background:#7a0000;color:white}
+.cblock{font-family:'DM Mono',monospace;font-size:9px;line-height:1.6}
+.cagency{display:block;font-size:9.5px;color:var(--nv);margin-bottom:3px;border-bottom:1px solid var(--lg);padding-bottom:2px}
+.crow{display:flex;gap:4px;margin-bottom:1px;align-items:flex-start}
+.clbl{font-weight:500;color:var(--gd);min-width:42px;flex-shrink:0;font-size:8px;text-transform:uppercase;padding-top:1px}
+/* status pills */
+.spill{display:inline-block;border-radius:4px;padding:3px 8px;font-family:'DM Mono',monospace;font-size:8.5px;font-weight:500;letter-spacing:.2px;white-space:nowrap}
+.spill.urgent{background:#7a0000;color:white}
+.spill.overdue{background:#9b3000;color:white}
+.spill.ready{background:#1a6b00;color:white}
+.spill.sent{background:#005a99;color:white}
+.spill.pending{background:#555;color:white}
+.spill.draft{background:#6b4400;color:white}
+.spill.evidence-ok{background:#4a0000;color:white}
+.spill.critical{background:#3a0000;color:#ffcc00}
+.spill.default{background:#ccc;color:#333}
+/* row tints */
+.urgent-row td{background:#fff8f8}
+.overdue-row td{background:#fff9f5}
+.ready-row td{background:#f8fff8}
+.critical-row td{background:#fff3f3}
+/* buttons */
+.acell{white-space:nowrap;min-width:120px}
+.btn{display:inline-block;padding:5px 9px;border-radius:5px;font-family:'DM Mono',monospace;font-size:9px;font-weight:500;cursor:pointer;border:none;text-decoration:none;margin-bottom:3px;transition:.15s;width:100%}
+.gbtn{background:#c5221f;color:white;text-align:center}
+.gbtn:hover{background:#a01c1a}
+.dbtn{background:var(--nv);color:white;text-align:center}
+.dbtn:hover{background:#1a3a5c}
+.mbtn{background:var(--lg);color:var(--nv);border:1px solid #ccc;text-align:center}
+.mbtn:hover{background:#d4e8d4;border-color:#1a6b00;color:#1a6b00}
+.mbtn.marked{background:#1a6b00;color:white;border-color:#1a6b00}
+/* badges */
+.tbadge{display:inline-block;border-radius:3px;padding:2px 6px;font-family:'DM Mono',monospace;font-size:8px;font-weight:500;letter-spacing:.2px}
+.eb{background:#1a3a5c;color:white}
+.pb{background:#0a4a0a;color:white}
+.vb{background:#4a0000;color:white}
+.hidden{display:none!important}
+footer{background:var(--nv);color:#445;text-align:center;padding:14px;font-family:'DM Mono',monospace;font-size:9.5px;border-top:3px solid var(--gd)}
+footer a{color:var(--gd);text-decoration:none}
+@media(max-width:700px){.hdr-top,.ctrl{padding:10px 14px}.wrap{padding:12px 14px}.htitle{font-size:15px}}
+
+/* ── TIMER ANIMATIONS ─────────────────────────────────────────────────── */
+@keyframes flash-slow{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes flash-fast{0%,100%{opacity:1}50%{opacity:.1}}
+@keyframes flash-multi{
+  0%  {background:#7a0000;color:#fff;box-shadow:0 0 8px #ff0000}
+  25% {background:#ff6600;color:#fff;box-shadow:0 0 12px #ff6600}
+  50% {background:#cc0000;color:#ffff00;box-shadow:0 0 16px #ffff00}
+  75% {background:#990000;color:#ff9900;box-shadow:0 0 12px #ff9900}
+  100%{background:#7a0000;color:#fff;box-shadow:0 0 8px #ff0000}
+}
+@keyframes flash-pulse{
+  0%,100%{background:#7a0000;box-shadow:0 0 4px #ff0000}
+  50%{background:#cc0000;box-shadow:0 0 14px #ff4444}
+}
+
+.dtimer.green        {background:#e8ffe8;color:#1a6b00;font-weight:500}
+.dtimer.yellow       {background:#fffae8;color:#7a6000;font-weight:500}
+.dtimer.due-soon     {background:#ff4444;color:white;font-weight:700;
+                      animation:flash-slow 1.4s ease-in-out infinite;border-radius:4px;padding:3px 7px}
+.dtimer.due-critical {background:#ff0000;color:white;font-weight:700;
+                      animation:flash-fast .5s ease-in-out infinite;border-radius:4px;padding:3px 7px}
+.dtimer.overdue-mild {background:#9b3000;color:white;font-weight:700;
+                      animation:flash-slow 1.8s ease-in-out infinite;border-radius:4px;padding:3px 7px}
+.dtimer.overdue-urgent{background:#cc0000;color:white;font-weight:700;
+                       animation:flash-pulse .7s ease-in-out infinite;border-radius:4px;padding:3px 7px}
+.dtimer.overdue-extreme{color:white;font-weight:700;
+                        animation:flash-multi .9s ease-in-out infinite;border-radius:4px;padding:3px 7px}
+
+/* Dashboard deadline card timers same classes */
+.dd-timer.green        {color:#1a6b00}
+.dd-timer.yellow       {color:#7a6000}
+.dd-timer.due-soon     {color:#ff4444;animation:flash-slow 1.4s ease-in-out infinite;display:inline-block}
+.dd-timer.due-critical {color:#ff0000;animation:flash-fast .5s ease-in-out infinite;display:inline-block}
+.dd-timer.overdue-mild {color:#cc4400;animation:flash-slow 1.8s ease-in-out infinite;display:inline-block}
+.dd-timer.overdue-urgent{color:#ff2200;animation:flash-pulse .7s ease-in-out infinite;display:inline-block}
+.dd-timer.overdue-extreme{animation:flash-multi .9s ease-in-out infinite;display:inline-block;
+                          padding:1px 6px;border-radius:3px}
+</style>
+</head>
+<body>
+<!-- WELCOME BANNER -->
+<div style="background:linear-gradient(135deg,#0a1628,#1a2a40);border-bottom:2px solid #c9a84c;padding:14px 28px;text-align:center">
+  <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:white;margin-bottom:5px">
+    Welcome to the Official Case Portal of Joseph Anthony Rivera
+  </div>
+  <div style="font-family:'Source Serif 4',Georgia,serif;font-size:12px;font-style:italic;color:#c9a84c;margin-bottom:6px">
+    &ldquo;I am not looking for someone to manage my case &mdash; I am looking for someone who fights it.
+    If you know the Constitution the way Carl Miller knew the Constitution,
+    pull up a chair.&rdquo;
+  </div>
+  <div style="font-family:'DM Mono',monospace;font-size:9.5px;color:#667;letter-spacing:.5px">
+    Attorneys, advocates, and oversight agencies &mdash; everything you need is on this page.
+  </div>
+</div>
+<div class="hdr">
+  <div class="hdr-top">
+    <div>
+      <div class="htitle">Rivera v. <span>LCSO</span> — Official Case Portal</div>
+      <div class="hsub">Joseph Anthony Rivera &nbsp;|&nbsp; (239) 220-9313 &nbsp;|&nbsp; <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ec888d9a85828f84858f838d988988ac8b818d8580c28f8381">[email&#160;protected]</a> &nbsp;|&nbsp; 1435 SE 10th Ter, Cape Coral FL 33990</div>
+    </div>
+    <div class="sol-box">
+      <div class="sol-lbl">STATUTE OF LIMITATIONS</div>
+      <div class="sol-clk" id="sol-clk">Loading...</div>
+      <div class="sol-lbl">DEADLINE: JAN 28, 2028</div>
+    </div>
+  </div>
+</div>
+<div class="banner">
+  <b>⚠ ACTION REQUIRED</b>
+  Send all red items today — email + certified mail &nbsp;|&nbsp;
+  Photograph vehicle damage ASAP — razor slashes = critical evidence &nbsp;|&nbsp;
+  <a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="glink">📁 Google Drive Case Folder</a>
+</div>
+
+<!-- LEGAL DEADLINES DASHBOARD -->
+<div class="ddash">
+  <div class="ddash-title">⏱ Legal Deadlines &amp; Response Timers</div>
+  <div class="dd-grid" id="dd-grid"></div>
+</div>
+
+<div class="stats">
+  <div class="scard"><div class="sn" style="color:var(--cr)" id="c-urgent">—</div><div class="sl">Send Today</div></div>
+  <div class="scard"><div class="sn" style="color:#9b3000" id="c-over">—</div><div class="sl">No Response</div></div>
+  <div class="scard"><div class="sn" style="color:var(--ready-c)" id="c-ready">—</div><div class="sl">Ready to Send</div></div>
+  <div class="scard"><div class="sn" style="color:var(--sent-c)" id="c-sent">—</div><div class="sl">Sent</div></div>
+  <div class="scard"><div class="sn" style="color:var(--ev-c)" id="c-evid">—</div><div class="sl">Evidence Items</div></div>
+  <div class="scard"><div class="sn" style="color:var(--pending-c)" id="c-pend">—</div><div class="sl">Pending</div></div>
+  <div class="scard"><div class="sn" id="c-tot">—</div><div class="sl">Total</div></div>
+</div>
+<div class="ctrl">
+  <input type="text" class="srch" placeholder="Search any document, agency, or status..." oninput="doFilter()">
+  <button class="fb active" onclick="fby('all',this)">All</button>
+  <button class="fb" onclick="fby('urgent',this)">🔴 Send Today</button>
+  <button class="fb" onclick="fby('overdue',this)">⚠ No Response</button>
+  <button class="fb" onclick="fby('email',this)">✉ Email</button>
+  <button class="fb" onclick="fby('print',this)">🖨 Print/Mail</button>
+  <button class="fb" onclick="fby('evidence',this)">📹 Evidence</button>
+</div>
+<div class="ver">Version: March 03, 2026 at 10:55 PM &nbsp;|&nbsp; jriveralegal.github.io/case-file- &nbsp;|&nbsp; Rebuilt each session — always current</div>
+<div class="wrap">
+<table><thead><tr>
+  <th>ID</th><th>Document / Evidence</th><th style="text-align:center">Dates</th>
+  <th>Agency &amp; Contact</th><th>Status</th><th>Actions</th>
+</tr></thead>
+<tbody id="tbody"><tr class="sec-hdr"><td colspan="6">⚠ NON-RESPONSE NOTICES</td></tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="email" data-sec="Non-Response Notices">
+  <td class="idcell">NR-1</td>
+  <td class="tcell"><div class="dtitle">LCSO Non-Response Notice</div><div class="ddesc">Covers all 4 LCSO submissions. Cites Fla. Stat. §§119.07, 119.10, Monell deliberate indifference. 10-day demand.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Mar 2, 2026</div><div class="dlbl">Deadline</div><div class="dval">Mar 12, 2026</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Lee County Sheriff's Office</b><div class="crow"><span class="clbl">MAIL</span>14750 Six Mile Cypress Pkwy<br>Fort Myers, FL 33912</div><div class="crow"><span class="clbl">PHONE</span>(239) 477-1000 main<br>(239) 258-3366 IA</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6c1e090f031e081f2c1f04091e050a0a0009090a0042031e0b">[email&#160;protected]</a><br><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="036a6243706b66716a65656f6666656f2d6c7164">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">SEND TODAY</span></td>
+  <td class="acell"><a href="https://mail.google.com/mail/?view=cm&fs=1&to=records%40sheriffleefl.org%2Cia%40sheriffleefl.org&su=Rivera%20v.%20LCSO%20%E2%80%94%20Non-Response%20Notice%20%2B%20Policy%20Request%20%E2%80%94%20March%202%2C%202026&body=Dear%20LCSO%20Records%20Division%20and%20Internal%20Affairs%2C%0A%0AI%20am%20formally%20notifying%20LCSO%20of%20its%20failure%20to%20respond%20to%20four%20submissions%20made%20February%2024-26%2C%202026.%20Attached%3A%20%281%29%20Notice%20of%20Non-Response%20citing%20Fla.%20Stat.%20%C2%A7%C2%A7119.07%2C%20119.10%2C%20and%20Monell%20deliberate%20indifference%3B%20%282%29%20Chapter%20119%20Policy%20and%20Pay%20Rate%20Records%20Request.%0A%0AThis%20submission%20is%20part%20of%20the%20formal%20civil%20rights%20complaint%20filed%20by%20Joseph%20Anthony%20Rivera%20regarding%20the%20January%2028%2C%202026%20incident%20involving%20Lee%20County%20Sheriff%27s%20Office%20Deputy%20Steven%20Rogers%20%28Badge%20%2322234%29%20and%20three%20additional%20LCSO%20deputies.%0A%0AAll%20documents%20are%20being%20sent%20via%20certified%20mail%20return%20receipt%20requested%20on%20the%20same%20date%20as%20this%20email.%20Please%20confirm%20receipt%20and%20provide%20a%20written%20response%20or%20reference%20number%20at%20your%20earliest%20opportunity.%0A%0ARespectfully%20submitted%2C%0A%0AJoseph%20Anthony%20Rivera%0A1435%20SE%2010th%20Ter%2C%20Cape%20Coral%2C%20FL%2033990%0APhone%3A%20%28239%29%20220-9313%0AEmail%3A%20davinchicoated%40gmail.com%0ADate%3A%20March%2003%2C%202026" target="_blank" class="btn gbtn">✉ Open Gmail</a><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="NR-1">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="email" data-sec="Non-Response Notices">
+  <td class="idcell">NR-2</td>
+  <td class="tcell"><div class="dtitle">FDLE Non-Response Notice</div><div class="ddesc">Covers both FDLE submissions. Verbal declination non-compliant with Fla. Stat. §943.12.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Mar 2, 2026</div><div class="dlbl">Deadline</div><div class="dval">Mar 12, 2026</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Florida Dept of Law Enforcement</b><div class="crow"><span class="clbl">MAIL</span>SW Regional: 2295 Victoria Ave, Fort Myers FL 33901<br>HQ/IG: 2331 Phillips Rd, Tallahassee FL 32308</div><div class="crow"><span class="clbl">PHONE</span>(239) 278-7000 SW Regional<br>(850) 410-7001 HQ/IG</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="480e0c040d0b213e21241a212f203c3b072e2e212b2d082e2c242d663b3c293c2d662e24663d3b">[email&#160;protected]</a><br><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ce8187898ea8aaa2abe0bdbaafbaabe0a8a2e0bbbd">[email&#160;protected]</a><br><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="793a332a2d3a391f1d151c570a0d180d1c571f15570c0a">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">SEND TODAY</span></td>
+  <td class="acell"><a href="https://mail.google.com/mail/?view=cm&fs=1&to=FDLECivilRightsOffice%40fdle.state.fl.us%2COIG%40fdle.state.fl.us%2CCJSTC%40fdle.state.fl.us&su=Rivera%20v.%20LCSO%20%E2%80%94%20Non-Response%20Notice%20%2B%203rd%20Monell%20Submission%20%E2%80%94%20March%202%2C%202026&body=Dear%20FDLE%20Civil%20Rights%20Office%2C%20Inspector%20General%2C%20and%20CJSTC%2C%0A%0AThis%20is%20the%20third%20formal%20submission%20regarding%20the%20Jan%2028%2C%202026%20incident.%20Two%20prior%20submissions%20received%20no%20written%20response.%20The%20verbal%20declination%20by%20FDLE%20directly%20contradicts%20Fla.%20Stat.%20%C2%A7943.12.%20Attached%3A%20Non-Response%20Notice%20%2B%20Enhanced%20Monell%20submission%20%2B%20FDLE%20policy%20request.%0A%0AThis%20submission%20is%20part%20of%20the%20formal%20civil%20rights%20complaint%20filed%20by%20Joseph%20Anthony%20Rivera%20regarding%20the%20January%2028%2C%202026%20incident%20involving%20Lee%20County%20Sheriff%27s%20Office%20Deputy%20Steven%20Rogers%20%28Badge%20%2322234%29%20and%20three%20additional%20LCSO%20deputies.%0A%0AAll%20documents%20are%20being%20sent%20via%20certified%20mail%20return%20receipt%20requested%20on%20the%20same%20date%20as%20this%20email.%20Please%20confirm%20receipt%20and%20provide%20a%20written%20response%20or%20reference%20number%20at%20your%20earliest%20opportunity.%0A%0ARespectfully%20submitted%2C%0A%0AJoseph%20Anthony%20Rivera%0A1435%20SE%2010th%20Ter%2C%20Cape%20Coral%2C%20FL%2033990%0APhone%3A%20%28239%29%20220-9313%0AEmail%3A%20davinchicoated%40gmail.com%0ADate%3A%20March%2003%2C%202026" target="_blank" class="btn gbtn">✉ Open Gmail</a><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="NR-2">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="email" data-sec="Non-Response Notices">
+  <td class="idcell">NR-3</td>
+  <td class="tcell"><div class="dtitle">Clerk Non-Response Notice</div><div class="ddesc">Covers written objection and notarized complaint to both branches. Interaction on video.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Mar 2, 2026</div><div class="dlbl">Deadline</div><div class="dval">Mar 12, 2026</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Lee County Clerk of Courts</b><div class="crow"><span class="clbl">MAIL</span>Fort Myers: 2115 Second St FL 33901<br>Cape Coral: 1415 Pine Island Rd FL 33909</div><div class="crow"><span class="clbl">PHONE</span>(239) 533-5000 Ft Myers<br>(239) 574-6011 Cape Coral</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b5d6d9d0c7def5d9d0d0d6d9d0c7de9bdac7d2">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">SEND TODAY</span></td>
+  <td class="acell"><a href="https://mail.google.com/mail/?view=cm&fs=1&to=clerk%40leeclerk.org&su=Rivera%20v.%20LCSO%20%E2%80%94%20Clerk%20Non-Response%20Notice%20%2B%20Policy%20Request%20%E2%80%94%20March%202%2C%202026&body=Dear%20Lee%20County%20Clerk%20of%20Courts%20Records%20Division%2C%0A%0AFormally%20notifying%20the%20Clerk%20of%20its%20failure%20to%20respond%20to%20the%20written%20objection%20and%20notarized%20complaint%20submitted%20Feb%2024-25%2C%202026.%20The%20refusal%20policy%20has%20no%20basis%20in%20Chapter%20119.%20Attached%3A%20Non-Response%20Notice%20%2B%20Clerk%20policy%20request.%0A%0AThis%20submission%20is%20part%20of%20the%20formal%20civil%20rights%20complaint%20filed%20by%20Joseph%20Anthony%20Rivera%20regarding%20the%20January%2028%2C%202026%20incident%20involving%20Lee%20County%20Sheriff%27s%20Office%20Deputy%20Steven%20Rogers%20%28Badge%20%2322234%29%20and%20three%20additional%20LCSO%20deputies.%0A%0AAll%20documents%20are%20being%20sent%20via%20certified%20mail%20return%20receipt%20requested%20on%20the%20same%20date%20as%20this%20email.%20Please%20confirm%20receipt%20and%20provide%20a%20written%20response%20or%20reference%20number%20at%20your%20earliest%20opportunity.%0A%0ARespectfully%20submitted%2C%0A%0AJoseph%20Anthony%20Rivera%0A1435%20SE%2010th%20Ter%2C%20Cape%20Coral%2C%20FL%2033990%0APhone%3A%20%28239%29%20220-9313%0AEmail%3A%20davinchicoated%40gmail.com%0ADate%3A%20March%2003%2C%202026" target="_blank" class="btn gbtn">✉ Open Gmail</a><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="NR-3">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="email" data-sec="Non-Response Notices">
+  <td class="idcell">NR-4</td>
+  <td class="tcell"><div class="dtitle">DOJ Non-Response Notice</div><div class="ddesc">No acknowledgment for Feb 25-26 portal submission. 72-hour standard exceeded.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Mar 2, 2026</div><div class="dlbl">Deadline</div><div class="dval">Mar 12, 2026</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">U.S. Dept of Justice — Civil Rights Division</b><div class="crow"><span class="clbl">MAIL</span>950 Pennsylvania Ave NW<br>Washington, DC 20530</div><div class="crow"><span class="clbl">PHONE</span>(202) 514-3847<br>1-800-869-4499</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1475677f707b7e546167707b7e3a737b62">[email&#160;protected]</a><br>civilrights.justice.gov</div></div></td>
+  <td><span class="spill urgent">SEND TODAY</span></td>
+  <td class="acell"><a href="https://mail.google.com/mail/?view=cm&fs=1&to=askdoj%40usdoj.gov&su=Rivera%20v.%20LCSO%20%E2%80%94%2034%20U.S.C.%20%C2%A712601%20%E2%80%94%20Non-Response%20Follow-Up%20%E2%80%94%20March%202%2C%202026&body=Dear%20DOJ%20Civil%20Rights%20Division%2C%20Special%20Litigation%20Section%2C%0A%0AFollowing%20up%20on%20pattern%20and%20practice%20complaint%20submitted%20Feb%2025-26%2C%202026%20via%20DOJ%20portal%20%E2%80%94%20no%20acknowledgment%20received.%20Resubmitting%20with%20enhanced%20Monell%20evidence%20including%20five%20parallel%20LCSO%20cases%20and%20expert-analyzed%20Marceno%20statements%20under%2034%20U.S.C.%20%C2%A712601.%0A%0AThis%20submission%20is%20part%20of%20the%20formal%20civil%20rights%20complaint%20filed%20by%20Joseph%20Anthony%20Rivera%20regarding%20the%20January%2028%2C%202026%20incident%20involving%20Lee%20County%20Sheriff%27s%20Office%20Deputy%20Steven%20Rogers%20%28Badge%20%2322234%29%20and%20three%20additional%20LCSO%20deputies.%0A%0AAll%20documents%20are%20being%20sent%20via%20certified%20mail%20return%20receipt%20requested%20on%20the%20same%20date%20as%20this%20email.%20Please%20confirm%20receipt%20and%20provide%20a%20written%20response%20or%20reference%20number%20at%20your%20earliest%20opportunity.%0A%0ARespectfully%20submitted%2C%0A%0AJoseph%20Anthony%20Rivera%0A1435%20SE%2010th%20Ter%2C%20Cape%20Coral%2C%20FL%2033990%0APhone%3A%20%28239%29%20220-9313%0AEmail%3A%20davinchicoated%40gmail.com%0ADate%3A%20March%2003%2C%202026" target="_blank" class="btn gbtn">✉ Open Gmail</a><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="NR-4">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="email" data-sec="Non-Response Notices">
+  <td class="idcell">NR-5</td>
+  <td class="tcell"><div class="dtitle">ACLU Non-Response Notice</div><div class="ddesc">No intake acknowledgment for Feb 25-26 submission. Requests review status.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Mar 2, 2026</div><div class="dlbl">Deadline</div><div class="dval">Mar 12, 2026</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">ACLU of Florida</b><div class="crow"><span class="clbl">MAIL</span>4343 W Flagler St, Suite 400<br>Miami, FL 33134</div><div class="crow"><span class="clbl">PHONE</span>(786) 363-2700</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ec85828a83ac8d8f80998a80c2839e8b">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">SEND TODAY</span></td>
+  <td class="acell"><a href="https://mail.google.com/mail/?view=cm&fs=1&to=info%40aclufl.org&su=Rivera%20v.%20LCSO%20%E2%80%94%20Police%20Practices%20%E2%80%94%20Pattern%20and%20Practice%20%E2%80%94%20Follow-Up%20%E2%80%94%20March%202%2C%202026&body=Dear%20ACLU%20of%20Florida%20Intake%20Department%2C%0A%0AFollowing%20up%20on%20civil%20rights%20intake%20submitted%20Feb%2025-26%2C%202026%20with%20no%20acknowledgment.%20Attached%3A%20Non-Response%20Notice%20%2B%20Enhanced%20Monell%20submission%20documenting%20five%20parallel%20LCSO%20cases.%20SOL%3A%20January%2028%2C%202028.%0A%0AThis%20submission%20is%20part%20of%20the%20formal%20civil%20rights%20complaint%20filed%20by%20Joseph%20Anthony%20Rivera%20regarding%20the%20January%2028%2C%202026%20incident%20involving%20Lee%20County%20Sheriff%27s%20Office%20Deputy%20Steven%20Rogers%20%28Badge%20%2322234%29%20and%20three%20additional%20LCSO%20deputies.%0A%0AAll%20documents%20are%20being%20sent%20via%20certified%20mail%20return%20receipt%20requested%20on%20the%20same%20date%20as%20this%20email.%20Please%20confirm%20receipt%20and%20provide%20a%20written%20response%20or%20reference%20number%20at%20your%20earliest%20opportunity.%0A%0ARespectfully%20submitted%2C%0A%0AJoseph%20Anthony%20Rivera%0A1435%20SE%2010th%20Ter%2C%20Cape%20Coral%2C%20FL%2033990%0APhone%3A%20%28239%29%20220-9313%0AEmail%3A%20davinchicoated%40gmail.com%0ADate%3A%20March%2003%2C%202026" target="_blank" class="btn gbtn">✉ Open Gmail</a><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="NR-5">✓ Mark Sent</button></td>
+</tr>
+<tr class="sec-hdr"><td colspan="6">⚖ MONELL EDITIONS</td></tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="email" data-sec="Monell Editions">
+  <td class="idcell">M-1</td>
+  <td class="tcell"><div class="dtitle">FDLE Enhanced Monell — 3rd Submission</div><div class="ddesc">All 5 pattern cases, statutes verbatim, CJSTC decertification request.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Not yet sent</div><div class="dlbl">Deadline</div><div class="dval">Send Today</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">FDLE — SW Regional + CJSTC</b><div class="crow"><span class="clbl">MAIL</span>2295 Victoria Ave, Fort Myers FL 33901<br>2331 Phillips Rd, Tallahassee FL 32308</div><div class="crow"><span class="clbl">PHONE</span>(239) 278-7000<br>(850) 410-7001</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c88e8c848d8ba1bea1a49aa1afa0bcbb87aeaea1abad88aeaca4ade6bbbca9bcade6aea4e6bdbb">[email&#160;protected]</a><br><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c2818891968182a4a6aea7ecb1b6a3b6a7eca4aeecb7b1">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">SEND TODAY</span></td>
+  <td class="acell"><a href="https://mail.google.com/mail/?view=cm&fs=1&to=FDLECivilRightsOffice%40fdle.state.fl.us%2COIG%40fdle.state.fl.us%2CCJSTC%40fdle.state.fl.us&su=Rivera%20v.%20LCSO%20%E2%80%94%203rd%20Submission%20%E2%80%94%20Full%20Monell%20Pattern%20Evidence%20%E2%80%94%20March%202%2C%202026&body=Dear%20FDLE%20Civil%20Rights%20Office%2C%20Inspector%20General%2C%20and%20CJSTC%2C%0A%0AThird%20formal%20submission.%20Full%20Monell%20pattern%20evidence%3A%20five%20parallel%20LCSO%20cases%2C%20all%20statutes%20verbatim%2C%20CJSTC%20decertification%20request%20for%20all%20involved%20officers%20including%20Deputy%20Rogers%20Badge%20%2322234.%0A%0AThis%20submission%20is%20part%20of%20the%20formal%20civil%20rights%20complaint%20filed%20by%20Joseph%20Anthony%20Rivera%20regarding%20the%20January%2028%2C%202026%20incident%20involving%20Lee%20County%20Sheriff%27s%20Office%20Deputy%20Steven%20Rogers%20%28Badge%20%2322234%29%20and%20three%20additional%20LCSO%20deputies.%0A%0AAll%20documents%20are%20being%20sent%20via%20certified%20mail%20return%20receipt%20requested%20on%20the%20same%20date%20as%20this%20email.%20Please%20confirm%20receipt%20and%20provide%20a%20written%20response%20or%20reference%20number%20at%20your%20earliest%20opportunity.%0A%0ARespectfully%20submitted%2C%0A%0AJoseph%20Anthony%20Rivera%0A1435%20SE%2010th%20Ter%2C%20Cape%20Coral%2C%20FL%2033990%0APhone%3A%20%28239%29%20220-9313%0AEmail%3A%20davinchicoated%40gmail.com%0ADate%3A%20March%2003%2C%202026" target="_blank" class="btn gbtn">✉ Open Gmail</a><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="M-1">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="email" data-sec="Monell Editions">
+  <td class="idcell">M-2</td>
+  <td class="tcell"><div class="dtitle">ACLU Enhanced Monell</div><div class="ddesc">Full Monell package. Pattern cases, representation request, fee structure and Clerk obstruction advocacy.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Not yet sent</div><div class="dlbl">Deadline</div><div class="dval">Send Today</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">ACLU of Florida</b><div class="crow"><span class="clbl">MAIL</span>4343 W Flagler St, Suite 400<br>Miami, FL 33134</div><div class="crow"><span class="clbl">PHONE</span>(786) 363-2700</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7e171018113e1f1d120b181250110c19">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">SEND TODAY</span></td>
+  <td class="acell"><a href="https://mail.google.com/mail/?view=cm&fs=1&to=info%40aclufl.org&su=Rivera%20v.%20LCSO%20%E2%80%94%20Full%20Monell%20Pattern%20Evidence%20%E2%80%94%20ACLU%20Intake%20%E2%80%94%20March%202%2C%202026&body=Dear%20ACLU%20of%20Florida%20Intake%20Department%2C%0A%0ASubmitting%20enhanced%20Monell%20package%20for%20ACLU%20review.%20Five%20parallel%20LCSO%20cases%20documented.%20LCSO%20%24150%2Fvideo%20fee%20structure%20prices%20out%20accountability.%20Three%20Lee%20County%20agencies%20coordinated%20public%20records%20obstruction.%20Requesting%20representation%2C%20co-counsel%20referral%2C%20or%20policy%20advocacy.%0A%0AThis%20submission%20is%20part%20of%20the%20formal%20civil%20rights%20complaint%20filed%20by%20Joseph%20Anthony%20Rivera%20regarding%20the%20January%2028%2C%202026%20incident%20involving%20Lee%20County%20Sheriff%27s%20Office%20Deputy%20Steven%20Rogers%20%28Badge%20%2322234%29%20and%20three%20additional%20LCSO%20deputies.%0A%0AAll%20documents%20are%20being%20sent%20via%20certified%20mail%20return%20receipt%20requested%20on%20the%20same%20date%20as%20this%20email.%20Please%20confirm%20receipt%20and%20provide%20a%20written%20response%20or%20reference%20number%20at%20your%20earliest%20opportunity.%0A%0ARespectfully%20submitted%2C%0A%0AJoseph%20Anthony%20Rivera%0A1435%20SE%2010th%20Ter%2C%20Cape%20Coral%2C%20FL%2033990%0APhone%3A%20%28239%29%20220-9313%0AEmail%3A%20davinchicoated%40gmail.com%0ADate%3A%20March%2003%2C%202026" target="_blank" class="btn gbtn">✉ Open Gmail</a><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="M-2">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="email" data-sec="Monell Editions">
+  <td class="idcell">M-3</td>
+  <td class="tcell"><div class="dtitle">DOJ Enhanced Monell — §12601</div><div class="ddesc">Marceno statements as direct policymaker evidence. Special Litigation Section request.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Not yet sent</div><div class="dlbl">Deadline</div><div class="dval">Send Today</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">U.S. Dept of Justice — Special Litigation</b><div class="crow"><span class="clbl">MAIL</span>950 Pennsylvania Ave NW<br>Washington, DC 20530</div><div class="crow"><span class="clbl">PHONE</span>(202) 514-3847</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3e5f4d555a51547e4b4d5a515410595148">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">SEND TODAY</span></td>
+  <td class="acell"><a href="https://mail.google.com/mail/?view=cm&fs=1&to=askdoj%40usdoj.gov&su=Rivera%20v.%20LCSO%20%E2%80%94%2034%20U.S.C.%20%C2%A712601%20Pattern%20%26%20Practice%20%E2%80%94%20Full%20Monell%20Submission&body=Dear%20DOJ%20Civil%20Rights%20Division%2C%20Special%20Litigation%20Section%2C%0A%0ASubmitting%20full%20Monell%20evidence%20under%2034%20U.S.C.%20%C2%A712601.%20Five%20parallel%20LCSO%20cases.%20Sheriff%20Marceno%20public%20statements%20analyzed%20by%20three%20independent%20law%20enforcement%20experts%20as%20endorsing%20conduct%20outside%20written%20policy%20%E2%80%94%20constituting%20direct%20policymaker%20evidence%20under%20Monell%20v.%20Dept%20of%20Social%20Services%2C%20436%20U.S.%20658%20%281978%29.%0A%0AThis%20submission%20is%20part%20of%20the%20formal%20civil%20rights%20complaint%20filed%20by%20Joseph%20Anthony%20Rivera%20regarding%20the%20January%2028%2C%202026%20incident%20involving%20Lee%20County%20Sheriff%27s%20Office%20Deputy%20Steven%20Rogers%20%28Badge%20%2322234%29%20and%20three%20additional%20LCSO%20deputies.%0A%0AAll%20documents%20are%20being%20sent%20via%20certified%20mail%20return%20receipt%20requested%20on%20the%20same%20date%20as%20this%20email.%20Please%20confirm%20receipt%20and%20provide%20a%20written%20response%20or%20reference%20number%20at%20your%20earliest%20opportunity.%0A%0ARespectfully%20submitted%2C%0A%0AJoseph%20Anthony%20Rivera%0A1435%20SE%2010th%20Ter%2C%20Cape%20Coral%2C%20FL%2033990%0APhone%3A%20%28239%29%20220-9313%0AEmail%3A%20davinchicoated%40gmail.com%0ADate%3A%20March%2003%2C%202026" target="_blank" class="btn gbtn">✉ Open Gmail</a><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="M-3">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="email" data-sec="Monell Editions">
+  <td class="idcell">M-4</td>
+  <td class="tcell"><div class="dtitle">Florida AG Enhanced Monell</div><div class="ddesc">Dual-track: Chapter 119 violations by three agencies + LCSO use-of-force pattern.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Not yet sent</div><div class="dlbl">Deadline</div><div class="dval">Send Today</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Florida Attorney General</b><div class="crow"><span class="clbl">MAIL</span>The Capitol PL-01<br>Tallahassee, FL 32399-1050</div><div class="crow"><span class="clbl">PHONE</span>1-866-966-7226<br>(850) 414-3300</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2b48425f42514e4505584e595d42484e586b46524d474459424f4a474e4c4a4705484446">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">SEND TODAY</span></td>
+  <td class="acell"><a href="https://mail.google.com/mail/?view=cm&fs=1&to=citizen.services%40myfloridalegal.com&su=Rivera%20v.%20LCSO%20%E2%80%94%20Chapter%20119%20Violations%20%2B%20Use%20of%20Force%20Pattern%20%E2%80%94%20March%202%2C%202026&body=Dear%20Florida%20Office%20of%20the%20Attorney%20General%2C%20Citizen%20Services%2C%0A%0ASubmitting%20dual-track%20complaint%3A%20%281%29%20Willful%20Chapter%20119%20violations%20by%20LCSO%2C%20FDLE%2C%20and%20Lee%20County%20Clerk%20%E2%80%94%20all%20three%20documented%3B%20%282%29%20LCSO%20use-of-force%20pattern%20across%20five%20cases%20for%20potential%20state%20civil%20rights%20action%20under%20Fla.%20Stat.%20%C2%A7119.10.%0A%0AThis%20submission%20is%20part%20of%20the%20formal%20civil%20rights%20complaint%20filed%20by%20Joseph%20Anthony%20Rivera%20regarding%20the%20January%2028%2C%202026%20incident%20involving%20Lee%20County%20Sheriff%27s%20Office%20Deputy%20Steven%20Rogers%20%28Badge%20%2322234%29%20and%20three%20additional%20LCSO%20deputies.%0A%0AAll%20documents%20are%20being%20sent%20via%20certified%20mail%20return%20receipt%20requested%20on%20the%20same%20date%20as%20this%20email.%20Please%20confirm%20receipt%20and%20provide%20a%20written%20response%20or%20reference%20number%20at%20your%20earliest%20opportunity.%0A%0ARespectfully%20submitted%2C%0A%0AJoseph%20Anthony%20Rivera%0A1435%20SE%2010th%20Ter%2C%20Cape%20Coral%2C%20FL%2033990%0APhone%3A%20%28239%29%20220-9313%0AEmail%3A%20davinchicoated%40gmail.com%0ADate%3A%20March%2003%2C%202026" target="_blank" class="btn gbtn">✉ Open Gmail</a><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="M-4">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="email" data-sec="Monell Editions">
+  <td class="idcell">M-5</td>
+  <td class="tcell"><div class="dtitle">U.S. Attorney MDFL Enhanced Monell</div><div class="ddesc">18 U.S.C. §242 criminal review for video deletion. Smith v. Cumming (11th Cir.) binding.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Not yet sent</div><div class="dlbl">Deadline</div><div class="dval">Send Today</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">U.S. Attorney's Office MDFL</b><div class="crow"><span class="clbl">MAIL</span>400 N Tampa St, Suite 3200<br>Tampa, FL 33602</div><div class="crow"><span class="clbl">PHONE</span>(813) 274-6000</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f4818795929899da9580808db48187909b9eda939b82">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">SEND TODAY</span></td>
+  <td class="acell"><a href="https://mail.google.com/mail/?view=cm&fs=1&to=usaflm.atty%40usdoj.gov&su=Rivera%20v.%20LCSO%20%E2%80%94%2018%20U.S.C.%20%C2%A7242%20Criminal%20Referral%20%2B%20%C2%A712601%20Pattern%20%E2%80%94%20March%202%2C%202026&body=Dear%20U.S.%20Attorney%27s%20Office%20MDFL%2C%20Civil%20Rights%20Coordinator%2C%0A%0ARequesting%20review%20under%2018%20U.S.C.%20%C2%A7242%20for%20LCSO%20officer%20deletion%20of%20recorded%20video%20%E2%80%94%20First%20Amendment%20violation%20per%20Smith%20v.%20Cumming%2C%20212%20F.3d%201332%20%2811th%20Cir.%202000%29%2C%20binding%20in%20this%20district%20%E2%80%94%20and%20unlawful%202-3%20hour%20detention%20without%20probable%20cause.%20Requesting%20referral%20to%20DOJ%20Special%20Litigation%20under%2034%20U.S.C.%20%C2%A712601.%0A%0AThis%20submission%20is%20part%20of%20the%20formal%20civil%20rights%20complaint%20filed%20by%20Joseph%20Anthony%20Rivera%20regarding%20the%20January%2028%2C%202026%20incident%20involving%20Lee%20County%20Sheriff%27s%20Office%20Deputy%20Steven%20Rogers%20%28Badge%20%2322234%29%20and%20three%20additional%20LCSO%20deputies.%0A%0AAll%20documents%20are%20being%20sent%20via%20certified%20mail%20return%20receipt%20requested%20on%20the%20same%20date%20as%20this%20email.%20Please%20confirm%20receipt%20and%20provide%20a%20written%20response%20or%20reference%20number%20at%20your%20earliest%20opportunity.%0A%0ARespectfully%20submitted%2C%0A%0AJoseph%20Anthony%20Rivera%0A1435%20SE%2010th%20Ter%2C%20Cape%20Coral%2C%20FL%2033990%0APhone%3A%20%28239%29%20220-9313%0AEmail%3A%20davinchicoated%40gmail.com%0ADate%3A%20March%2003%2C%202026" target="_blank" class="btn gbtn">✉ Open Gmail</a><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="M-5">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="email" data-sec="Monell Editions">
+  <td class="idcell">M-6</td>
+  <td class="tcell"><div class="dtitle">Institute for Justice Enhanced Monell</div><div class="ddesc">1st Amend video deletion + 4th Amend pattern + $150 fee as unconstitutional-conditions challenge.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Not yet sent</div><div class="dlbl">Deadline</div><div class="dval">Send Today</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Institute for Justice</b><div class="crow"><span class="clbl">MAIL</span>901 N Glebe Road, Suite 900<br>Arlington, VA 22203</div><div class="crow"><span class="clbl">PHONE</span>(703) 682-9320</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7f181a111a0d1e133f161551100d18">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">SEND TODAY</span></td>
+  <td class="acell"><a href="https://mail.google.com/mail/?view=cm&fs=1&to=general%40ij.org&su=Rivera%20v.%20LCSO%20%E2%80%94%20First%20Amendment%20%2B%204th%20Amendment%20%2B%20Records%20Fee%20Challenge%20%E2%80%94%20IJ%20Intake&body=Dear%20Institute%20for%20Justice%20Intake%2C%0A%0AIntake%20on%20three%20IJ-specific%20constitutional%20theories%3A%20%281%29%20First%20Amendment%20%E2%80%94%20officer%20deletion%20of%20recorded%20video%3B%20%282%29%20Fourth%20Amendment%20%E2%80%94%20warrantless%20vehicle%20search%20with%20property%20damage%20in%20documented%20LCSO%20pattern%3B%20%283%29%20LCSO%20%24150%2Fvideo%20fee%20structure%20as%20financial%20barrier%20to%20public%20records%20accountability.%0A%0AThis%20submission%20is%20part%20of%20the%20formal%20civil%20rights%20complaint%20filed%20by%20Joseph%20Anthony%20Rivera%20regarding%20the%20January%2028%2C%202026%20incident%20involving%20Lee%20County%20Sheriff%27s%20Office%20Deputy%20Steven%20Rogers%20%28Badge%20%2322234%29%20and%20three%20additional%20LCSO%20deputies.%0A%0AAll%20documents%20are%20being%20sent%20via%20certified%20mail%20return%20receipt%20requested%20on%20the%20same%20date%20as%20this%20email.%20Please%20confirm%20receipt%20and%20provide%20a%20written%20response%20or%20reference%20number%20at%20your%20earliest%20opportunity.%0A%0ARespectfully%20submitted%2C%0A%0AJoseph%20Anthony%20Rivera%0A1435%20SE%2010th%20Ter%2C%20Cape%20Coral%2C%20FL%2033990%0APhone%3A%20%28239%29%20220-9313%0AEmail%3A%20davinchicoated%40gmail.com%0ADate%3A%20March%2003%2C%202026" target="_blank" class="btn gbtn">✉ Open Gmail</a><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="M-6">✓ Mark Sent</button></td>
+</tr>
+<tr class="sec-hdr"><td colspan="6">📋 FILED COMPLAINTS</td></tr>
+<tr class="drow overdue-row" data-status="overdue" data-type="print" data-sec="Filed Complaints">
+  <td class="idcell">C-1</td>
+  <td class="tcell"><div class="dtitle">LCSO Chapter 119 Records Request</div><div class="ddesc">Body cameras (4 officers), CAD logs, use-of-force reports, disciplinary records. Jan 28, 2026.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 24-25, 2026</div><div class="dlbl">Deadline</div><div class="dval">Mar 7, 2026</div><div class="dtimer" data-deadline="2026-03-07T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Lee County Sheriff's Office</b><div class="crow"><span class="clbl">MAIL</span>14750 Six Mile Cypress Pkwy<br>Fort Myers, FL 33912</div><div class="crow"><span class="clbl">PHONE</span>(239) 477-1000</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2a584f4945584e596a59424f58434c4c464f4f4c460445584d">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill overdue">NO RESPONSE — PAST DEADLINE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="C-1">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow overdue-row" data-status="overdue" data-type="print" data-sec="Filed Complaints">
+  <td class="idcell">C-2</td>
+  <td class="tcell"><div class="dtitle">LCSO $150/Video Fee Challenge</div><div class="ddesc">Challenges fee under Fla. Stat. §119.07(4). Demands itemized cost or reduction.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 25, 2026</div><div class="dlbl">Deadline</div><div class="dval">Mar 4, 2026</div><div class="dtimer" data-deadline="2026-03-04T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Lee County Sheriff's Office</b><div class="crow"><span class="clbl">MAIL</span>14750 Six Mile Cypress Pkwy<br>Fort Myers, FL 33912</div><div class="crow"><span class="clbl">PHONE</span>(239) 477-1000</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f18394929e839582b1829994839897979d9494979ddf9e8396">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill overdue">NO RESPONSE — PAST DEADLINE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="C-2">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow overdue-row" data-status="overdue" data-type="print" data-sec="Filed Complaints">
+  <td class="idcell">C-3</td>
+  <td class="tcell"><div class="dtitle">LCSO CAD Addendum — Feb 5-11</div><div class="ddesc">Dispatch logs for phone theft/return incident at Daniels/41 plaza.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 25-26, 2026</div><div class="dlbl">Deadline</div><div class="dval">Mar 7, 2026</div><div class="dtimer" data-deadline="2026-03-07T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Lee County Sheriff's Office</b><div class="crow"><span class="clbl">MAIL</span>14750 Six Mile Cypress Pkwy<br>Fort Myers, FL 33912</div><div class="crow"><span class="clbl">PHONE</span>(239) 477-1000</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="dfadbabcb0adbbac9facb7baadb6b9b9b3babab9b3f1b0adb8">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill overdue">NO RESPONSE — PAST DEADLINE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="C-3">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow overdue-row" data-status="overdue" data-type="print" data-sec="Filed Complaints">
+  <td class="idcell">C-4</td>
+  <td class="tcell"><div class="dtitle">Clerk Written Objection — Both Branches</div><div class="ddesc">Objection to standalone-request refusal. No basis in Chapter 119. Interaction on video.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 24-25, 2026</div><div class="dlbl">Deadline</div><div class="dval">Mar 3, 2026</div><div class="dtimer" data-deadline="2026-03-03T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Lee County Clerk of Courts</b><div class="crow"><span class="clbl">MAIL</span>Fort Myers: 2115 Second St<br>Cape Coral: 1415 Pine Island Rd</div><div class="crow"><span class="clbl">PHONE</span>(239) 533-5000</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a1c2cdc4d3cae1cdc4c4c2cdc4d3ca8fced3c6">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill overdue">NO RESPONSE — PAST DEADLINE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="C-4">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow overdue-row" data-status="overdue" data-type="print" data-sec="Filed Complaints">
+  <td class="idcell">C-5</td>
+  <td class="tcell"><div class="dtitle">Clerk Formal Complaint — Notarized</div><div class="ddesc">Escalation. Demands written policy and statutory authority.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 25, 2026</div><div class="dlbl">Deadline</div><div class="dval">Mar 3, 2026</div><div class="dtimer" data-deadline="2026-03-03T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Lee County Clerk of Courts</b><div class="crow"><span class="clbl">MAIL</span>Fort Myers: 2115 Second St<br>Cape Coral: 1415 Pine Island Rd</div><div class="crow"><span class="clbl">PHONE</span>(239) 533-5000</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ceada2abbca58ea2ababada2abbca5e0a1bca9">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill overdue">NO RESPONSE — PAST DEADLINE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="C-5">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow overdue-row" data-status="overdue" data-type="print" data-sec="Filed Complaints">
+  <td class="idcell">C-6</td>
+  <td class="tcell"><div class="dtitle">FDLE Escalation Letter — 2nd Submission</div><div class="ddesc">Verbal declination vs. Fla. Stat. §943.12. Demands CJSTC review.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 25-26, 2026</div><div class="dlbl">Deadline</div><div class="dval">Mar 3, 2026</div><div class="dtimer" data-deadline="2026-03-03T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">FDLE SW Regional Operations</b><div class="crow"><span class="clbl">MAIL</span>2295 Victoria Ave<br>Fort Myers, FL 33901</div><div class="crow"><span class="clbl">PHONE</span>(239) 278-7000</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0345474f46406a756a6f516a646b77704c65656a60664365676f662d70776277662d656f2d7670">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill overdue">NO RESPONSE — PAST DEADLINE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="C-6">✓ Mark Sent</button></td>
+</tr>
+<tr class="sec-hdr"><td colspan="6">📄 POLICY/FOIA REQUESTS</td></tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="print" data-sec="Policy/FOIA Requests">
+  <td class="idcell">PL-1</td>
+  <td class="tcell"><div class="dtitle">LCSO Policy & Pay Rate Request</div><div class="ddesc">Use-of-force policy, Baker Act procedures, body camera policy, pay/overtime for involved officers.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Not yet sent</div><div class="dlbl">Deadline</div><div class="dval">Send Today</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Lee County Sheriff's Office</b><div class="crow"><span class="clbl">MAIL</span>14750 Six Mile Cypress Pkwy<br>Fort Myers, FL 33912</div><div class="crow"><span class="clbl">PHONE</span>(239) 477-1000</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cab8afa9a5b8aeb98ab9a2afb8a3acaca6afafaca6e4a5b8ad">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">READY TO SEND TODAY</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="PL-1">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="print" data-sec="Policy/FOIA Requests">
+  <td class="idcell">PL-2</td>
+  <td class="tcell"><div class="dtitle">Clerk Policy Request — Both Branches</div><div class="ddesc">Written policy on records requests, training materials, standalone-request directives.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Not yet sent</div><div class="dlbl">Deadline</div><div class="dval">Send Today</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Lee County Clerk of Courts</b><div class="crow"><span class="clbl">MAIL</span>Fort Myers: 2115 Second St<br>Cape Coral: 1415 Pine Island Rd</div><div class="crow"><span class="clbl">PHONE</span>(239) 533-5000</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="51323d34233a113d3434323d34233a7f3e2336">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">READY TO SEND TODAY</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="PL-2">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="print" data-sec="Policy/FOIA Requests">
+  <td class="idcell">PL-3</td>
+  <td class="tcell"><div class="dtitle">FDLE Complaint Processing Policy</div><div class="ddesc">Written policy on individual complaints, CJSTC procedures, verbal vs. written responses.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Not yet sent</div><div class="dlbl">Deadline</div><div class="dval">Send Today</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">FDLE SW Regional Operations</b><div class="crow"><span class="clbl">MAIL</span>2295 Victoria Ave<br>Fort Myers, FL 33901</div><div class="crow"><span class="clbl">PHONE</span>(239) 278-7000</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4701030b02042e312e2b152e202f33340821212e24220721232b2269343326332269212b693234">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">READY TO SEND TODAY</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="PL-3">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow urgent-row" data-status="urgent" data-type="print" data-sec="Policy/FOIA Requests">
+  <td class="idcell">PL-4</td>
+  <td class="tcell"><div class="dtitle">Five Below Corporate Policy Request</div><div class="ddesc">Lost/found policy, law enforcement interaction policy, LCSO on premises Feb 5-11.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Not yet sent</div><div class="dlbl">Deadline</div><div class="dval">Send Today</div><div class="dtimer" data-deadline="2026-03-12T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Five Below Inc.</b><div class="crow"><span class="clbl">MAIL</span>701 Market Street<br>Philadelphia, PA 19106</div><div class="crow"><span class="clbl">PHONE</span>N/A</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="19757c7e7875597f706f7c7b7c75766e377a7674">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill urgent">READY TO SEND TODAY</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="PL-4">✓ Mark Sent</button></td>
+</tr>
+<tr class="sec-hdr"><td colspan="6">🔒 PRESERVATION DEMANDS</td></tr>
+<tr class="drow sent-row" data-status="sent" data-type="print" data-sec="Preservation Demands">
+  <td class="idcell">PD-1</td>
+  <td class="tcell"><div class="dtitle">Daniels/41 Plaza — Preservation Demand</div><div class="ddesc">All surveillance Feb 5-11. Phone returned here by LCSO. Stamped receipt on file.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 25, 2026</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td><div class="cblock"><b class="cagency">Daniels/41 Plaza Management</b><div class="crow"><span class="clbl">MAIL</span>Daniels Pkwy & US-41<br>Fort Myers, FL 33912</div><div class="crow"><span class="clbl">PHONE</span>On file</div><div class="crow"><span class="clbl">EMAIL</span>Delivered in person</div></div></td>
+  <td><span class="spill sent">SENT — ACTIVE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="PD-1">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow sent-row" data-status="sent" data-type="print" data-sec="Preservation Demands">
+  <td class="idcell">PD-2</td>
+  <td class="tcell"><div class="dtitle">Ross Dress for Less — Preservation Demand</div><div class="ddesc">Surveillance Jan 28 and Feb 5-11. Stamped receipt on file.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 25, 2026</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td><div class="cblock"><b class="cagency">Ross Dress for Less</b><div class="crow"><span class="clbl">MAIL</span>Daniels/41 Plaza, Fort Myers FL 33912</div><div class="crow"><span class="clbl">PHONE</span>On file</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5519303234391130252115273a267b363a38">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill sent">SENT — ACTIVE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="PD-2">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow sent-row" data-status="sent" data-type="print" data-sec="Preservation Demands">
+  <td class="idcell">PD-3</td>
+  <td class="tcell"><div class="dtitle">Five Below — Preservation Demand</div><div class="ddesc">Exterior footage parking area where phone was returned. Stamped receipt on file.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 25, 2026</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td><div class="cblock"><b class="cagency">Five Below — Daniels/41</b><div class="crow"><span class="clbl">MAIL</span>Daniels/41 Plaza, Fort Myers FL 33912</div><div class="crow"><span class="clbl">PHONE</span>On file</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d8b4bdbfb9b498beb1aebdbabdb4b7aff6bbb7b5">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill sent">SENT — ACTIVE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="PD-3">✓ Mark Sent</button></td>
+</tr>
+<tr class="sec-hdr"><td colspan="6">📱 APPLE LITIGATION HOLDS</td></tr>
+<tr class="drow sent-row" data-status="sent" data-type="email" data-sec="Apple Litigation Holds">
+  <td class="idcell">AP-1</td>
+  <td class="tcell"><div class="dtitle">Apple Legal — Both iCloud Accounts</div><div class="ddesc">Litigation hold for <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b3dfc6c5d7dcddc7dfdac5d6d0dcdfd7f3dad0dfdcc6d79dd0dcde">[email&#160;protected]</a> and <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="385b574841484a574041000078515b54574d5c165b5755">[email&#160;protected]</a>. Auto-response received Feb 26.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 26, 2026</div><div class="dlbl">Deadline</div><div class="dval">Mar 5 follow-up</div><div class="dtimer" data-deadline="2026-03-05T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">Apple Inc. — Legal</b><div class="crow"><span class="clbl">MAIL</span>One Apple Park Way<br>Cupertino, CA 95014</div><div class="crow"><span class="clbl">PHONE</span>1-800-275-2273</div><div class="crow"><span class="clbl">EMAIL</span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cba7aeacaaa7bbaaacaeb88baabbbba7aee5a8a4a6">[email&#160;protected]</a></div></div></td>
+  <td><span class="spill sent">SENT — FOLLOW UP BY MAR 5</span></td>
+  <td class="acell"><a href="https://mail.google.com/mail/?view=cm&fs=1&to=legalpages%40apple.com&su=Follow-Up%3A%20Rivera%20Litigation%20Hold%20%E2%80%94%20Two%20iCloud%20Accounts%20%E2%80%94%20Confirmation%20Requested&body=Dear%20Apple%20Legal%20Department%2C%0A%0AFollowing%20up%20on%20litigation%20hold%20submitted%20Feb%2026%2C%202026.%20Auto-response%20received%20but%20no%20substantive%20confirmation%20of%20active%20preservation.%20Requesting%20written%20confirmation%20that%20data%20is%20preserved%20on%20both%20accounts%20%28luvdontlivecold%40icloud.com%20and%20copyproxy88%40icloud.com%29.%0A%0AThis%20submission%20is%20part%20of%20the%20formal%20civil%20rights%20complaint%20filed%20by%20Joseph%20Anthony%20Rivera%20regarding%20the%20January%2028%2C%202026%20incident%20involving%20Lee%20County%20Sheriff%27s%20Office%20Deputy%20Steven%20Rogers%20%28Badge%20%2322234%29%20and%20three%20additional%20LCSO%20deputies.%0A%0AAll%20documents%20are%20being%20sent%20via%20certified%20mail%20return%20receipt%20requested%20on%20the%20same%20date%20as%20this%20email.%20Please%20confirm%20receipt%20and%20provide%20a%20written%20response%20or%20reference%20number%20at%20your%20earliest%20opportunity.%0A%0ARespectfully%20submitted%2C%0A%0AJoseph%20Anthony%20Rivera%0A1435%20SE%2010th%20Ter%2C%20Cape%20Coral%2C%20FL%2033990%0APhone%3A%20%28239%29%20220-9313%0AEmail%3A%20davinchicoated%40gmail.com%0ADate%3A%20March%2003%2C%202026" target="_blank" class="btn gbtn">✉ Open Gmail</a><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="AP-1">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow sent-row" data-status="sent" data-type="email" data-sec="Apple Litigation Holds">
+  <td class="idcell">AP-2</td>
+  <td class="tcell"><div class="dtitle">Apple Privacy — <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c2aeb7b4a6adacb6aeabb4a7a1adaea682aba1aeadb7a6eca1adaf">[email&#160;protected]</a></div><div class="ddesc">Location, device sign-in, Find My, iCloud access records for Jan 28 and Feb 5-11.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 26, 2026</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td><div class="cblock"><b class="cagency">Apple Inc. — Privacy</b><div class="crow"><span class="clbl">MAIL</span>One Apple Park Way<br>Cupertino, CA 95014</div><div class="crow"><span class="clbl">PHONE</span>N/A</div><div class="crow"><span class="clbl">EMAIL</span>privacy.apple.com</div></div></td>
+  <td><span class="spill sent">SENT</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="AP-2">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow sent-row" data-status="sent" data-type="email" data-sec="Apple Litigation Holds">
+  <td class="idcell">AP-3</td>
+  <td class="tcell"><div class="dtitle">Apple Privacy — <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e3808c939a93918c9b9adbdba38a808f8c9687cd808c8e">[email&#160;protected]</a></div><div class="ddesc">Same scope as AP-2 for second account.</div><div style="margin-top:5px"><span class="tbadge eb">EMAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 26, 2026</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td><div class="cblock"><b class="cagency">Apple Inc. — Privacy</b><div class="crow"><span class="clbl">MAIL</span>One Apple Park Way<br>Cupertino, CA 95014</div><div class="crow"><span class="clbl">PHONE</span>N/A</div><div class="crow"><span class="clbl">EMAIL</span>privacy.apple.com</div></div></td>
+  <td><span class="spill sent">SENT</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="AP-3">✓ Mark Sent</button></td>
+</tr>
+<tr class="sec-hdr"><td colspan="6">👔 ATTORNEY OUTREACH</td></tr>
+<tr class="drow ready-row" data-status="ready" data-type="print" data-sec="Attorney Outreach">
+  <td class="idcell">AT-1</td>
+  <td class="tcell"><div class="dtitle">John Bryan — Civil Rights Attorney</div><div class="ddesc">Referral letter with full case summary and Monell pattern.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Not yet sent</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td><div class="cblock"><b class="cagency">John Bryan</b><div class="crow"><span class="clbl">MAIL</span>Verify at floridabar.org</div><div class="crow"><span class="clbl">PHONE</span>Verify</div><div class="crow"><span class="clbl">EMAIL</span>Verify</div></div></td>
+  <td><span class="spill ready">READY TO SEND</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="AT-1">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow ready-row" data-status="ready" data-type="print" data-sec="Attorney Outreach">
+  <td class="idcell">AT-2</td>
+  <td class="tcell"><div class="dtitle">Harold Deon Thompson — De Novo Law</div><div class="ddesc">Florida-specific referral letter.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Not yet sent</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td><div class="cblock"><b class="cagency">De Novo Law</b><div class="crow"><span class="clbl">MAIL</span>Verify at denovolaw.com</div><div class="crow"><span class="clbl">PHONE</span>Verify</div><div class="crow"><span class="clbl">EMAIL</span>Verify</div></div></td>
+  <td><span class="spill ready">READY TO SEND</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="AT-2">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow default-row" data-status="default" data-type="print" data-sec="Attorney Outreach">
+  <td class="idcell">AT-3</td>
+  <td class="tcell"><div class="dtitle">Blank Attorney Template</div><div class="ddesc">Reusable template for any civil rights firm.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">Template</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td><div class="cblock"><b class="cagency">N/A</b><div class="crow"><span class="clbl">MAIL</span>N/A</div><div class="crow"><span class="clbl">PHONE</span>N/A</div><div class="crow"><span class="clbl">EMAIL</span>N/A</div></div></td>
+  <td><span class="spill default">TEMPLATE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="AT-3">✓ Mark Sent</button></td>
+</tr>
+<tr class="sec-hdr"><td colspan="6">🏛 PRO SE FILING</td></tr>
+<tr class="drow draft-row" data-status="draft" data-type="print" data-sec="Pro Se Filing">
+  <td class="idcell">PS-1</td>
+  <td class="tcell"><div class="dtitle">Pro Se Federal Complaint — 42 U.S.C. §1983</div><div class="ddesc">Draft complaint for MDFL. DO NOT FILE until attorney window closes or SOL approaches.</div><div style="margin-top:5px"><span class="tbadge pb">PRINT/MAIL</span></div></td>
+  <td class="datecell"><div class="dsent">DRAFT</div><div class="dlbl">Deadline</div><div class="dval">Jan 28, 2028 (SOL)</div><div class="dtimer" data-deadline="2028-01-28T00:00:00">Calculating...</div></td>
+  <td><div class="cblock"><b class="cagency">U.S. District Court MDFL</b><div class="crow"><span class="clbl">MAIL</span>2110 First Street<br>Fort Myers, FL 33901</div><div class="crow"><span class="clbl">PHONE</span>(239) 461-2000</div><div class="crow"><span class="clbl">EMAIL</span>ecf.flmd.uscourts.gov</div></div></td>
+  <td><span class="spill draft">DRAFT — HOLD FOR ATTORNEY</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="PS-1">✓ Mark Sent</button></td>
+</tr>
+<tr class="sec-hdr"><td colspan="6">🎥 EVIDENCE — VIDEOS</td></tr>
+<tr class="drow evidence-ok-row" data-status="evidence-ok" data-type="evidence" data-sec="Evidence — Videos">
+  <td class="idcell">EV-1</td>
+  <td class="tcell"><div class="dtitle">VIDEO — Officer Approach & Traffic Stop</div><div class="ddesc">Recorded by passenger Hannah. Shows initial approach, opening of traffic stop, officer conduct. FIRST clip.</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Jan 28, 2026</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td></td>
+  <td><span class="spill evidence-ok">IN GOOGLE DRIVE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="EV-1">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow evidence-ok-row" data-status="evidence-ok" data-type="evidence" data-sec="Evidence — Videos">
+  <td class="idcell">EV-2</td>
+  <td class="tcell"><div class="dtitle">VIDEO — Rivera on Ground, Four Officers</div><div class="ddesc">Shows Rivera on ground with all four deputies present. PRIMARY use-of-force evidence. SECOND clip.</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Jan 28, 2026</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td></td>
+  <td><span class="spill evidence-ok">IN GOOGLE DRIVE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="EV-2">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow evidence-ok-row" data-status="evidence-ok" data-type="evidence" data-sec="Evidence — Videos">
+  <td class="idcell">EV-3</td>
+  <td class="tcell"><div class="dtitle">VIDEO — Clerk Refusal Interaction</div><div class="ddesc">Clerk representative refusing to process standalone Chapter 119 request on video. Direct §119.10 evidence.</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 24-25, 2026</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td></td>
+  <td><span class="spill evidence-ok">IN GOOGLE DRIVE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="EV-3">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow pending-row" data-status="pending" data-type="evidence" data-sec="Evidence — Videos">
+  <td class="idcell">EV-4</td>
+  <td class="tcell"><div class="dtitle">VIDEO — Body Cameras All 4 Officers [SUBPOENA]</div><div class="ddesc">All four LCSO body cameras Jan 28. Chapter 119 request filed, fee challenged. Subpoena required.</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Pending</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td></td>
+  <td><span class="spill pending">PENDING — SUBPOENA LCSO</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="EV-4">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow pending-row" data-status="pending" data-type="evidence" data-sec="Evidence — Videos">
+  <td class="idcell">EV-5</td>
+  <td class="tcell"><div class="dtitle">VIDEO — Patrol Dash Camera [SUBPOENA]</div><div class="ddesc">Patrol vehicle dash camera Jan 28. Subpoena through attorney.</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Pending</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td></td>
+  <td><span class="spill pending">PENDING — SUBPOENA</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="EV-5">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow pending-row" data-status="pending" data-type="evidence" data-sec="Evidence — Videos">
+  <td class="idcell">EV-6</td>
+  <td class="tcell"><div class="dtitle">VIDEO — Spios Dental Exterior [SUBPOENA]</div><div class="ddesc">Direct line of sight to stop location. Send preservation demand then subpoena.</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Pending</div><div class="dlbl">Deadline</div><div class="dval">Mar 10 — send preservation demand</div><div class="dtimer" data-deadline="2026-03-10T00:00:00">Calculating...</div></td>
+  <td></td>
+  <td><span class="spill pending">PENDING — URGENT</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="EV-6">✓ Mark Sent</button></td>
+</tr>
+<tr class="sec-hdr"><td colspan="6">📸 EVIDENCE — PHOTOS</td></tr>
+<tr class="drow pending-row" data-status="pending" data-type="evidence" data-sec="Evidence — Photos">
+  <td class="idcell">EP-1</td>
+  <td class="tcell"><div class="dtitle">PHOTO — Broken Cup Holder</div><div class="ddesc">Physical damage from warrantless search. DO NOT clean or move. Photograph ASAP.</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Pending</div><div class="dlbl">Deadline</div><div class="dval">Photograph ASAP</div><div class="dtimer" data-deadline="2026-03-05T00:00:00">Calculating...</div></td>
+  <td></td>
+  <td><span class="spill pending">PHOTO PENDING — URGENT</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="EP-1">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow pending-row" data-status="pending" data-type="evidence" data-sec="Evidence — Photos">
+  <td class="idcell">EP-2</td>
+  <td class="tcell"><div class="dtitle">PHOTO — Interior Door/Panel Damage</div><div class="ddesc">Damage to door panels throughout vehicle. Wide and close-up shots of each panel.</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Pending</div><div class="dlbl">Deadline</div><div class="dval">Photograph ASAP</div><div class="dtimer" data-deadline="2026-03-05T00:00:00">Calculating...</div></td>
+  <td></td>
+  <td><span class="spill pending">PHOTO PENDING — URGENT</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="EP-2">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow critical-row" data-status="critical" data-type="evidence" data-sec="Evidence — Photos">
+  <td class="idcell">EP-3</td>
+  <td class="tcell"><div class="dtitle">PHOTO — Razor Slashes on Driver Seat</div><div class="ddesc">Multiple slash marks. One stitch completely ripped. Open razor on seat = proof of warrantless search. Include ruler for scale. CRITICAL EVIDENCE.</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Pending</div><div class="dlbl">Deadline</div><div class="dval">Photograph ASAP</div><div class="dtimer" data-deadline="2026-03-05T00:00:00">Calculating...</div></td>
+  <td></td>
+  <td><span class="spill critical">PHOTO PENDING — CRITICAL</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="EP-3">✓ Mark Sent</button></td>
+</tr>
+<tr class="sec-hdr"><td colspan="6">💾 EVIDENCE — DIGITAL</td></tr>
+<tr class="drow pending-row" data-status="pending" data-type="evidence" data-sec="Evidence — Digital">
+  <td class="idcell">ED-1</td>
+  <td class="tcell"><div class="dtitle">Apple iCloud Data — Both Accounts</div><div class="ddesc">Find My data, device sign-in logs, iCloud backup records Jan 28 and Feb 5-11. Proves phone on while 'missing.'</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Pending</div><div class="dlbl">Deadline</div><div class="dval">Mar 5 follow-up</div><div class="dtimer" data-deadline="2026-03-05T00:00:00">Calculating...</div></td>
+  <td></td>
+  <td><span class="spill pending">PENDING — APPLE RESPONSE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="ED-1">✓ Mark Sent</button></td>
+</tr>
+<tr class="sec-hdr"><td colspan="6">🚨 NON-COMPLIANT INTERACTIONS</td></tr>
+<tr class="drow evidence-ok-row" data-status="evidence-ok" data-type="evidence" data-sec="Non-Compliant Interactions">
+  <td class="idcell">NC-1</td>
+  <td class="tcell"><div class="dtitle">LCSO Sergeant Refusal to Document — Jan 29</div><div class="ddesc">Returned next day to report vehicle damage. Sergeant refused to document, drove away. Walgreens camera preservation active.</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Jan 29, 2026</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td></td>
+  <td><span class="spill evidence-ok">DOCUMENTED — WITNESS STATEMENT</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="NC-1">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow evidence-ok-row" data-status="evidence-ok" data-type="evidence" data-sec="Non-Compliant Interactions">
+  <td class="idcell">NC-2</td>
+  <td class="tcell"><div class="dtitle">FDLE Verbal Declination — Feb 24-25</div><div class="ddesc">'Does not do small groups or individual investigations' — directly contradicts Fla. Stat. §943.12.</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 24-25, 2026</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td></td>
+  <td><span class="spill evidence-ok">DOCUMENTED — WRITTEN RECORD</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="NC-2">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow evidence-ok-row" data-status="evidence-ok" data-type="evidence" data-sec="Non-Compliant Interactions">
+  <td class="idcell">NC-3</td>
+  <td class="tcell"><div class="dtitle">Clerk Refusal — On Video</div><div class="ddesc">Strongest Chapter 119 evidence in file. Recorded. No statutory basis for policy.</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 24-25, 2026</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td></td>
+  <td><span class="spill evidence-ok">ON VIDEO — IN DRIVE</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="NC-3">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow evidence-ok-row" data-status="evidence-ok" data-type="evidence" data-sec="Non-Compliant Interactions">
+  <td class="idcell">NC-4</td>
+  <td class="tcell"><div class="dtitle">LCSO Phone Return — Conflicting Custody</div><div class="ddesc">Phone powered ON when returned despite being OFF when stolen. Two officers gave conflicting accounts. No report filed.</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Feb 8-9, 2026</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td></td>
+  <td><span class="spill evidence-ok">DOCUMENTED — CAD ADDENDUM</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="NC-4">✓ Mark Sent</button></td>
+</tr>
+<tr class="drow evidence-ok-row" data-status="evidence-ok" data-type="evidence" data-sec="Non-Compliant Interactions">
+  <td class="idcell">NC-5</td>
+  <td class="tcell"><div class="dtitle">Baker Act Threat During Detention — Jan 28</div><div class="ddesc">Used as coercive threat during 2-3 hour detention. No hold initiated. Identical to King v. LCSO (2024).</div><div style="margin-top:5px"><span class="tbadge vb">EVIDENCE</span></div></td>
+  <td class="datecell"><div class="dsent">Jan 28, 2026</div><div class="dlbl">Deadline</div><div class="dval">N/A</div></td>
+  <td></td>
+  <td><span class="spill evidence-ok">DOCUMENTED — WITNESS STATEMENT</span></td>
+  <td class="acell"><br><a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank" class="btn dbtn">📁 Drive</a><br><button class="btn mbtn" onclick="markSent(this)" data-id="NC-5">✓ Mark Sent</button></td>
+</tr>
+</tbody></table>
+</div>
+<footer>
+  Rivera v. Lee County Sheriff's Office &nbsp;|&nbsp; Official Case Portal &nbsp;|&nbsp; March 03, 2026 at 10:55 PM<br>
+  SOL: January 28, 2028 &nbsp;|&nbsp;
+  <a href="https://drive.google.com/drive/folders/1eenhhp3UWUhbPXm_J7lt5av961u2kWZD" target="_blank">📁 Google Drive</a> &nbsp;|&nbsp;
+  <a href="https://jriveralegal.github.io/case-file-" target="_blank">jriveralegal.github.io/case-file-</a>
+</footer>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ── SOL CLOCK ──────────────────────────────────────────────────────────────
+const SOL = new Date("2028-01-28T00:00:00");
+function fmtTime(ms){
+  if(ms<=0) return "EXPIRED";
+  const d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),
+        m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);
+  return d+"d "+String(h).padStart(2,"0")+"h "+String(m).padStart(2,"0")+"m "+String(s).padStart(2,"0")+"s";
+}
+function fmtDiff(ms){
+  if(ms<0){
+    const neg=Math.abs(ms);
+    const d=Math.floor(neg/864e5),h=Math.floor(neg%864e5/36e5),
+          m=Math.floor(neg%36e5/6e4),s=Math.floor(neg%6e4/1e3);
+    const totalDays=Math.floor(neg/864e5);
+    let cls;
+    if(totalDays>=7)      cls="overdue-extreme";   // 7+ days: multi-color flash
+    else if(totalDays>=3) cls="overdue-urgent";     // 3-6 days: fast red flash
+    else                  cls="overdue-mild";        // <3 days: slow red flash
+    return {txt:"PAST DUE −"+d+"d "+String(h).padStart(2,"0")+"h "+String(m).padStart(2,"0")+"m "+String(s).padStart(2,"0")+"s",cls};
+  }
+  const d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),
+        m=Math.floor(ms%36e5/6e4),s=Math.floor(ms%6e4/1e3);
+  let cls;
+  if(ms<1*864e5)       cls="due-critical";   // <1 day: fast flash
+  else if(ms<3*864e5)  cls="due-soon";       // 1-3 days: slow flash red
+  else if(ms<7*864e5)  cls="yellow";         // 3-7 days: yellow
+  else                 cls="green";           // 7+ days: green
+  return {txt:d+"d "+String(h).padStart(2,"0")+"h "+String(m).padStart(2,"0")+"m "+String(s).padStart(2,"0")+"s remaining",cls};
+}
+function tick(){
+  const now=new Date();
+  document.getElementById("sol-clk").textContent=fmtTime(SOL-now);
+  // row timers
+  document.querySelectorAll(".dtimer[data-deadline]").forEach(el=>{
+    const dl=new Date(el.dataset.deadline);
+    const r=fmtDiff(dl-now);
+    el.textContent=r.txt; el.className="dtimer "+r.cls;
+  });
+}
+setInterval(tick,1000); tick();
+
+// ── DEADLINE DASHBOARD ─────────────────────────────────────────────────────
+const DEADLINES=[{label:'SOL — 42 U.S.C. §1983',date:'2028-01-28',cls:'critical',note:'File federal complaint before this date or lose the right to sue.'},
+{label:'LCSO IA Response Deadline',date:'2026-03-07',cls:'urgent',note:'10-business-day IA standard from Feb 24 submission.'},
+{label:'NR Notice Response — All',date:'2026-03-12',cls:'urgent',note:'10-day deadline on all non-response notices sent March 2.'},
+{label:'LCSO Fee Challenge Deadline',date:'2026-03-04',cls:'urgent',note:'Response to $150/video fee challenge.'},
+{label:'Apple Follow-Up Deadline',date:'2026-03-05',cls:'warning',note:'Confirm Apple litigation hold is active on both accounts.'},
+{label:'FDLE Written Response Due',date:'2026-03-03',cls:'overdue',note:'5-business-day window from Feb 26 FDLE submission.'},
+{label:'Clerk Response Due',date:'2026-03-03',cls:'overdue',note:'5-business-day window from Feb 24-25 Clerk submissions.'},
+{label:'DOJ Portal Acknowledgment Due',date:'2026-02-28',cls:'overdue',note:'72-hour portal acknowledgment standard — now 4 days overdue.'},
+{label:'Vehicle Damage Photos',date:'2026-03-05',cls:'urgent',note:'Photograph all damage ASAP — razor slashes on seat are critical evidence.'},
+{label:'Spios Dental Preservation',date:'2026-03-10',cls:'warning',note:'Send preservation demand to Spios Dental before footage is overwritten.'}];
+function buildDash(){
+  const grid=document.getElementById("dd-grid");
+  const now=new Date();
+  DEADLINES.forEach(dl=>{
+    const dt=new Date(dl.date+"T00:00:00");
+    const diff=dt-now;
+    const r=fmtDiff(diff);
+    const card=document.createElement("div");
+    card.className="dd-card "+dl.cls;
+    card.innerHTML=`<div class="dd-label">${dl.label}</div>
+      <div class="dd-timer ${r.cls}" id="ddt-${dl.date}">${r.txt}</div>
+      <div class="dd-note">${dl.note}</div>`;
+    grid.appendChild(card);
+  });
+  // live update dashboard timers
+  setInterval(()=>{
+    DEADLINES.forEach(dl=>{
+      const dt=new Date(dl.date+"T00:00:00");
+      const el=document.getElementById("ddt-"+dl.date);
+      if(el){const r=fmtDiff(dt-new Date()); el.textContent=r.txt; el.className="dd-timer "+r.cls;}
+    });
+  },1000);
+}
+buildDash();
+
+// ── STATS ──────────────────────────────────────────────────────────────────
+function updateStats(){
+  const rows=[...document.querySelectorAll("tr.drow")];
+  let u=0,o=0,re=0,se=0,ev=0,pe=0;
+  rows.forEach(r=>{
+    const st=r.dataset.status,ty=r.dataset.type;
+    if(st==="urgent"||st==="critical")u++;
+    else if(st==="overdue")o++;
+    else if(st==="ready")re++;
+    else if(st==="sent")se++;
+    if(ty==="evidence")ev++;
+    if(st==="pending")pe++;
+  });
+  document.getElementById("c-urgent").textContent=u;
+  document.getElementById("c-over").textContent=o;
+  document.getEleme
