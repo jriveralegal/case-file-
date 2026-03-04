@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rivera v. LCSO — Official Case Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nv:#0a1628;--gd:#c9a84c;--cr:#8b0000;--lg:#e2e0d8;--ow:#f9f7f2;--mg:#666;
+  --grn:#004d1a;--amb:#7a3a00;--pur:#2d0060;--blu:#003070;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Crimson Pro',Georgia,serif;background:var(--ow);color:#1a1a1a}
+
+/* ── HEADER ── */
+.hdr{background:var(--nv);border-bottom:3px solid var(--gd);position:sticky;top:0;z-index:300;box-shadow:0 4px 32px rgba(0,0,0,.6)}
+.hdr-inner{max-width:1500px;margin:auto;padding:8px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.htitle{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:white;line-height:1.1;flex-shrink:0}
+.htitle em{color:var(--gd);font-style:normal}
+.hsub{font-family:'DM Mono',monospace;font-size:7px;color:rgba(255,255,255,.45);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+
+/* header clocks */
+.clk{border-radius:6px;padding:5px 10px;text-align:center;flex-shrink:0;min-width:130px}
+.clk.sol{background:linear-gradient(135deg,#001a4d,#003080)}
+.clk.purge{background:linear-gradient(135deg,#4d0000,#8b0000);border:1px solid rgba(255,100,100,.4)}
+.clk.kw{background:linear-gradient(135deg,#3a2000,#6a3800);border:1px solid rgba(201,168,76,.3)}
+.clk.portal{background:linear-gradient(135deg,#001a3d,#003060);border:1px solid rgba(100,150,255,.3)}
+.clk-lbl{font-family:'DM Mono',monospace;font-size:6.5px;color:rgba(255,255,255,.55);letter-spacing:.8px;text-transform:uppercase}
+.clk-val{font-family:'DM Mono',monospace;font-size:9.5px;font-weight:500;margin:1px 0;letter-spacing:.3px}
+.clk.sol .clk-val{color:#7ec8ff}
+.clk.purge .clk-val{color:#ffaaaa}
+.clk.kw .clk-val{color:var(--gd)}
+.clk.portal .clk-val{color:#aac8ff}
+.clk-val.pd{animation:flash-red 0.8s infinite}
+.clk-val.near{color:#ffcc66!important;animation:flash-amber 1.5s infinite}
+
+/* ── FLASH ANIMATIONS ── */
+@keyframes flash-red{0%,100%{opacity:1;color:#ff4444}50%{opacity:.3;color:#ff0000}}
+@keyframes flash-amber{0%,100%{opacity:1;color:#ffaa00}50%{opacity:.5;color:#ff7700}}
+@keyframes flash-multi{
+  0%{color:#ff4444;text-shadow:0 0 8px #ff4444}
+  25%{color:#ff8800;text-shadow:0 0 8px #ff8800}
+  50%{color:#ffff00;text-shadow:0 0 8px #ffff00}
+  75%{color:#ff00ff;text-shadow:0 0 8px #ff00ff}
+  100%{color:#ff4444;text-shadow:0 0 8px #ff4444}
+}
+@keyframes flash-fast{0%,100%{opacity:1;color:#ff0000;text-shadow:0 0 12px #ff0000}50%{opacity:0;color:#ff0000}}
+@keyframes border-alarm{0%,100%{border-color:#ff0000;box-shadow:0 0 0 0 rgba(255,0,0,.4)}50%{border-color:#ff6666;box-shadow:0 0 0 4px rgba(255,0,0,.1)}}
+@keyframes pulse-slow{0%,100%{opacity:1}50%{opacity:.65}}
+
+/* pill flash classes */
+.flash-red{animation:flash-red .8s infinite}
+.flash-fast{animation:flash-fast .4s infinite}
+.flash-multi{animation:flash-multi .6s infinite}
+.flash-amber{animation:flash-amber 1.5s infinite}
+.flash-pulse{animation:pulse-slow 2s infinite}
+
+.gdrive{margin-left:auto;background:var(--gd);color:var(--nv);border:none;border-radius:5px;padding:6px 12px;font-family:'DM Mono',monospace;font-size:8px;font-weight:700;cursor:pointer;text-decoration:none;letter-spacing:.3px;flex-shrink:0}
+
+/* ── ALERT BANNERS ── */
+.alert{background:#5a0000;color:white;padding:7px 20px;font-family:'DM Mono',monospace;font-size:9px;border-bottom:2px solid #ff3333;text-align:center;animation:pulse-slow 2s infinite}
+.vfix{background:#0a2200;color:#90ff90;padding:5px 20px;font-family:'DM Mono',monospace;font-size:8.5px;border-bottom:1px solid #2a6600;text-align:center}
+.sendbanner{background:#7a2800;color:white;padding:6px 20px;font-family:'DM Mono',monospace;font-size:9px;text-align:center;border-bottom:1px solid #c94c00}
+
+/* ── DEADLINE DASHBOARD ── */
+.ddash{background:white;border-bottom:2px solid var(--lg);padding:12px 20px}
+.ddash-title{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.5px;color:var(--mg);text-transform:uppercase;margin-bottom:8px}
+.dd-grid{display:flex;gap:8px;flex-wrap:wrap}
+.ddc{border-radius:7px;padding:9px 12px;min-width:145px;flex:1;max-width:200px;transition:.3s}
+.ddc.critical{background:#fff0f0;border:2px solid #8b0000}
+.ddc.urgent{background:#fff5ee;border:1.5px solid #c94c00}
+.ddc.warning{background:#fffaf0;border:1.5px solid var(--gd)}
+.ddc.ok{background:#f0fff4;border:1px solid #005a20}
+.ddc.info{background:#f0f4ff;border:1px solid #003580}
+/* ALARM STATE — more than 3 days past due */
+.ddc.alarm{background:#2a0000;border:2px solid #ff0000;animation:border-alarm 1s infinite}
+.ddc.alarm .dd-ddate{animation:flash-multi .5s infinite}
+/* SUPER URGENT — 1-3 days past due */
+.ddc.superurg{background:#3a0000;border:2px solid #ff3300;animation:border-alarm 1.5s infinite}
+.ddc.superurg .dd-ddate{animation:flash-fast .4s infinite}
+/* OVERDUE but < 1 day */
+.ddc.overdue{background:#fff0f0;border:2px solid #cc0000}
+.ddc.overdue .dd-ddate{animation:flash-red .8s infinite}
+
+.dd-dlbl{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.5px;color:var(--mg);text-transform:uppercase}
+.ddc.alarm .dd-dlbl,.ddc.superurg .dd-dlbl{color:rgba(255,200,200,.7)}
+.dd-ddate{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;margin:2px 0}
+.ddc.critical .dd-ddate{color:#8b0000}
+.ddc.urgent .dd-ddate{color:#c94c00}
+.dd-dtimer{font-family:'DM Mono',monospace;font-size:8px;margin-top:2px}
+.dd-dnote{font-size:8.5px;color:var(--mg);margin-top:3px;font-family:'DM Mono',monospace}
+.ddc.alarm .dd-dnote,.ddc.superurg .dd-dnote{color:rgba(255,180,180,.8)}
+
+/* ── CONTROLS ── */
+.ctrl{padding:8px 20px;background:white;border-bottom:1px solid var(--lg);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.srch{flex:1;min-width:160px;padding:6px 10px;border:1.5px solid var(--lg);border-radius:5px;font-family:'DM Mono',monospace;font-size:10px;background:var(--ow)}
+.fb{padding:5px 10px;border:1.5px solid var(--lg);background:white;border-radius:5px;cursor:pointer;font-family:'DM Mono',monospace;font-size:8px;color:var(--nv);transition:.15s}
+.fb:hover,.fb.on{background:var(--nv);color:white;border-color:var(--nv)}
+.fb.red{border-color:#c94c00;color:#c94c00}
+.fb.red:hover,.fb.red.on{background:#c94c00;color:white}
+
+/* ── TABLE ── */
+.tbl-wrap{max-width:1500px;margin:0 auto;padding:0 20px 30px}
+table{width:100%;border-collapse:collapse;background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.08);margin-top:14px}
+thead tr{background:var(--nv)}
+th{padding:9px 10px;font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:.5px;text-transform:uppercase;text-align:left;color:rgba(255,255,255,.85);font-weight:500}
+td{padding:8px 10px;font-size:11px;vertical-align:top;border-bottom:1px solid var(--lg)}
+.dr:hover td{background:#f8f7f2}
+.dr.hidden{display:none}
+
+/* row alarm states */
+.dr.alarm-row td{border-left:3px solid #ff0000;background:#1a0000!important}
+.dr.alarm-row td{color:#ffcccc}
+.dr.superurg-row td{border-left:3px solid #ff3300;background:#120000!important;color:#ffdddd}
+.dr.send-row td{border-left:3px solid #c94c00}
+.dr.sent-row td{border-left:3px solid #005a20;opacity:.82}
+.dr.ev-row td{border-left:3px solid #6600cc}
+.dr.urg-row td{border-left:3px solid #8b0000}
+
+/* cell styles */
+.cgrp{font-family:'DM Mono',monospace;font-size:7px;color:var(--mg);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
+.dr.alarm-row .cgrp,.dr.superurg-row .cgrp{color:rgba(255,180,180,.6)}
+.cid{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:var(--nv)}
+.dr.alarm-row .cid,.dr.superurg-row .cid{color:#ff9999}
+.dtitle{font-weight:600;font-size:11px;margin-bottom:3px;font-family:'Crimson Pro',serif}
+.dr.alarm-row .dtitle{color:#ffcccc;animation:flash-multi .6s infinite}
+.dr.superurg-row .dtitle{color:#ffddcc;animation:flash-fast .4s infinite}
+.ddesc{font-size:9.5px;color:#444;line-height:1.5;margin-bottom:3px;font-family:'DM Mono',monospace}
+.dr.alarm-row .ddesc,.dr.superurg-row .ddesc{color:rgba(255,200,180,.7)}
+.badge{display:inline-block;font-family:'DM Mono',monospace;font-size:7px;padding:2px 6px;border-radius:3px;margin:1px 2px 1px 0;letter-spacing:.2px}
+.em{background:#003070;color:white}.cm{background:#001a6e;color:white}.ip{background:#3a2000;color:white}.po{background:#333;color:white}.pr{background:#2d0060;color:white}
+.crow{font-size:8.5px;color:#555;margin-top:2px;font-family:'DM Mono',monospace}
+.dr.alarm-row .crow,.dr.superurg-row .crow{color:rgba(255,200,180,.6)}
+.clbl{font-family:'DM Mono',monospace;font-size:7px;background:rgba(0,0,0,.08);padding:1px 4px;border-radius:2px;margin-right:3px}
+
+/* date cell */
+.dc{text-align:center;min-width:95px}
+.ds{font-family:'DM Mono',monospace;font-weight:700;font-size:9.5px;margin-bottom:2px}
+.dl{font-family:'DM Mono',monospace;color:var(--mg);font-size:7px;text-transform:uppercase;letter-spacing:.4px}
+.dv{font-family:'DM Mono',monospace;font-weight:700;font-size:9px;margin:1px 0}
+.dtmr{font-family:'DM Mono',monospace;font-size:8px;margin-top:3px;padding:2px 6px;border-radius:3px;display:inline-block}
+.dtmr.ok{background:#e8fff0;color:#005a20}
+.dtmr.near{background:#fff8e0;color:#7a4000;animation:flash-amber 1.5s infinite}
+.dtmr.over1{background:#3a0000;color:#ffaaaa;animation:flash-red .8s infinite}
+.dtmr.over3{background:#1a0000;color:#ff6666;animation:flash-fast .4s infinite;font-weight:700}
+.dtmr.over7{background:#0a0000;color:#ff4444;animation:flash-multi .5s infinite;font-weight:700;letter-spacing:.5px}
+
+/* status pills */
+.pill{display:inline-block;font-family:'DM Mono',monospace;font-size:7.5px;padding:3px 9px;border-radius:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.p-now{background:#c94c00;color:white;animation:flash-amber 2s infinite}
+.p-urg{background:#8b0000;color:white;animation:flash-red 1.5s infinite}
+.p-alarm{background:#ff0000;color:white;animation:flash-multi .5s infinite}
+.p-sent{background:#005a20;color:white}
+.p-ev{background:#2d0060;color:white}
+.p-pend{background:#555;color:white}
+
+/* action buttons */
+.acts{display:flex;flex-direction:column;gap:3px;min-width:110px}
+.ab{display:block;padding:4px 7px;border-radius:4px;font-family:'DM Mono',monospace;font-size:7.5px;font-weight:700;cursor:pointer;text-align:center;border:none;text-decoration:none;letter-spacing:.2px}
+.ab.gm{background:#d93025;color:white}
+.ab.pr{background:#1a1a1a;color:white}
+.ab.ms{background:#005a20;color:white}
+.ab.sl{background:#e0ddd8;color:#666;cursor:default;pointer-events:none}
+
+/* ── SEND GUIDE ── */
+.sg{max-width:1500px;margin:0 auto;padding:0 20px 20px}
+.sg-box{background:white;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.07);padding:18px;border-top:3px solid var(--gd)}
+.sg-h{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:var(--nv);border-bottom:2px solid var(--gd);padding-bottom:6px;margin-bottom:14px}
+.sg-step{border-radius:6px;padding:10px 14px;margin-bottom:8px;border-left:3px solid #ccc}
+.sg-step.s-urg{border-left-color:#8b0000;background:#fff8f8}
+.sg-step.s-em{border-left-color:#003070;background:#f8f8ff}
+.sg-step.s-ml{border-left-color:#005a20;background:#f8fff8}
+.sg-step.s-ip{border-left-color:#7a4400;background:#fffaf0}
+.sg-stitle{font-weight:700;font-size:11px;margin-bottom:4px;font-family:'Crimson Pro',serif}
+.sg-body{font-size:9.5px;line-height:1.8;color:#333;font-family:'DM Mono',monospace}
+code{background:#e8e6e0;padding:1px 5px;border-radius:3px;font-family:'DM Mono',monospace;font-size:8.5px}
+
+/* ── PANELS ── */
+.panels{max-width:1500px;margin:0 auto;padding:0 20px 20px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:800px){.panels{grid-template-columns:1fr}}
+.panel{background:white;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:18px}
+.panel.gh{background:#0d1117;color:#e6edf3;border-top:3px solid #58a6ff}
+.panel.gs{border-top:3px solid #0F9D58}
+.ph{font-family:'DM Mono',monospace;font-size:9.5px;font-weight:600;margin-bottom:12px;letter-spacing:.3px}
+.panel.gh .ph{color:#58a6ff}
+.panel.gs .ph{color:#0F9D58}
+.pstep{font-size:10px;line-height:1.8;margin-bottom:5px;font-family:'DM Mono',monospace}
+.panel.gh .pstep{color:#c9d1d9}
+.pcode{background:#161b22;border:1px solid #30363d;border-radius:5px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:9px;color:#a5d6ff;margin:4px 0;white-space:pre-wrap;word-break:break-all}
+
+/* ── CARL MILLER TRIBUTE ── */
+.cm-tribute{background:linear-gradient(135deg,#080808,#111111,#0a0808);border-top:3px solid var(--gd);border-bottom:3px solid var(--gd);padding:28px 20px;text-align:center;position:relative;overflow:hidden}
+.cm-tribute::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at center,rgba(201,168,76,.06) 0%,transparent 70%);pointer-events:none}
+.cm-inner{display:inline-block;border:1px solid rgba(201,168,76,.25);border-radius:12px;padding:24px 40px;max-width:750px;position:relative}
+.cm-inner::before{content:'"';font-family:'Playfair Display',serif;font-size:120px;color:rgba(201,168,76,.06);position:absolute;top:-20px;left:10px;line-height:1;pointer-events:none}
+.cm-stars{font-size:14px;letter-spacing:6px;color:var(--gd);margin-bottom:12px;opacity:.7}
+.cm-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:white;letter-spacing:1px;margin-bottom:4px}
+.cm-dates{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+.cm-quote{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:var(--gd);line-height:1.7;margin-bottom:14px;max-width:550px;margin-left:auto;margin-right:auto}
+.cm-bio{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.45);line-height:1.8;max-width:550px;margin:0 auto 14px}
+.cm-tags{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.cm-tag{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.5px;color:rgba(201,168,76,.6);border:1px solid rgba(201,168,76,.2);padding:3px 10px;border-radius:12px;text-transform:uppercase}
+
+/* ── FOOTER ── */
+.foot{background:var(--nv);border-top:2px solid rgba(201,168,76,.2);padding:14px 20px;text-align:center}
+.foot-txt{font-family:'DM Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.5px}
+
+@media print{
+  .hdr,.ctrl,.acts,.ab,.fb,.srch,.sg,.panels,.cm-tribute,.foot,.alert,.vfix,.sendbanner,.ddash{display:none!important}
+  .tbl-wrap{padding:0}
+  td,th{font-size:8px;padding:4px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-inner">
+    <div>
+      <div class="htitle">Rivera v. <em>LCSO</em></div>
+      <div class="hsub">Official Case Portal · Updated March 4, 2026</div>
+    </div>
+    <div class="clk sol"><div class="clk-lbl">SOL · Jan 28 2028</div><div class="clk-val" id="sol">…</div></div>
+    <div class="clk purge"><div class="clk-lbl">🚨 Body Cam Purge · Apr 28</div><div class="clk-val" id="purge">…</div></div>
+    <div class="clk kw"><div class="clk-lbl">Keywords Deadline · Mar 18</div><div class="clk-val" id="kw">…</div></div>
+    <div class="clk portal"><div class="clk-lbl">Portal Deadline · Mar 14</div><div class="clk-val" id="portal">…</div></div>
+    <a href="https://drive.google.com" target="_blank" class="gdrive">📁 Google Drive</a>
+  </div>
+</div>
+
+<div class="alert">🚨 NOTHING SENT SINCE MID-DAY FEB 26 — ALL "SEND TODAY" ITEMS MUST GO OUT NOW — MARCH 4, 2026</div>
+<div class="vfix">✅ VIDEO CORRECTION: The recording DELETED BY LCSO was on Rivera's phone (Rivera's own recording). Hannah's two videos on Hannah's phone are SAFE in Google Drive.</div>
+<div class="sendbanner">📋 6 LCSO RESPONSE LETTERS READY · LR-1 through LR-6 · FDLE Combined Monell Letter Ready · See send order below</div>
+
+<!-- DEADLINE DASHBOARD -->
+<div class="ddash">
+  <div class="ddash-title">⏱ All Active Deadlines — Live Countdown — Past-Due Shown in Red/Flashing · 3+ Days Past = Multi-Color Flash</div>
+  <div class="dd-grid" id="ddg"></div>
+</div>
+
+<!-- CONTROLS -->
+<div class="ctrl">
+  <input class="srch" id="srch" placeholder="🔍 Search documents, agencies, keywords…">
+  <button class="fb on" onclick="filt('all',this)">All</button>
+  <button class="fb red" onclick="filt('send-now',this)">🔴 Send Today</button>
+  <button class="fb" onclick="filt('sent',this)">✅ Sent</button>
+  <button class="fb" onclick="filt('email',this)">📧 Email</button>
+  <button class="fb" onclick="filt('mail',this)">📬 Cert Mail</button>
+  <button class="fb" onclick="filt('ev',this)">🔒 Evidence</button>
+  <button class="fb" onclick="window.print()">🖨️ Print Page</button>
+</div>
+
+<!-- TABLE -->
+<div class="tbl-wrap">
+<table><thead><tr>
+  <th>Group / ID</th><th>Document</th><th>Send To / Method</th>
+  <th>Date / Deadline</th><th>Status</th><th>Actions</th>
+</tr></thead>
+<tbody id="tb"></tbody></table>
+</div>
+
+<!-- SEND GUIDE -->
+<div class="sg">
+<div class="sg-box">
+<div class="sg-h">📋 March 4, 2026 — Complete Send Instructions (Chronological)</div>
+
+<div class="sg-step s-urg">
+  <div class="sg-stitle">🚨 STEP 1 — SEND RIGHT NOW: LR-4 Body Cam Fee Waiver + Spoliation Warning</div>
+  <div class="sg-body">Email: <code>records@sheriffleefl.org</code> + <code>ia@sheriffleefl.org</code><br>
+  Subject: <code>URGENT — Body Cam Fee Waiver + Spoliation Warning — Rivera — Jan 28 2026 — Purge April 28</code><br>
+  CC: <code>FDLECivilRightsOffice@fdle.state.fl.us, citizen.services@myfloridalegal.com, askdoj@usdoj.gov, usaflm.atty@usdoj.gov</code><br>
+  Then print + certified mail same day. 55 days until purge.</div>
+</div>
+
+<div class="sg-step s-em">
+  <div class="sg-stitle">📧 STEP 2: Remaining LCSO Letters LR-1, LR-2, LR-3, LR-5 (Email Today)</div>
+  <div class="sg-body">All to: <code>records@sheriffleefl.org</code> + <code>ia@sheriffleefl.org</code> — one email per letter, PDF attached.<br>
+  LR-1 = pre-portal email (citation discrepancy + non-acknowledgment of Jan 28)<br>
+  LR-2 = reply to their Part 1 (portal account) | LR-3 = reply to their Part 2 (keywords/fees, both citation numbers)<br>
+  LR-5 = objection to merger + Chapter 119 clarification (NOT FOIA, NOT tied to ticket, do NOT forward to Clerk)<br>
+  <strong>LR-6</strong> = GovQA portal link expired — original Feb 25 request still valid — demands new activation link + all future comms by email — SEND LAST</div>
+</div>
+
+<div class="sg-step s-em">
+  <div class="sg-stitle">📧 STEP 3: FDLE Combined Letter — Escalation + Monell (Email + Certified Mail)</div>
+  <div class="sg-body">Email: <code>FDLECivilRightsOffice@fdle.state.fl.us</code> + <code>OIG@fdle.state.fl.us</code><br>
+  Certified mail: <code>2295 Victoria Ave, Fort Myers FL 33901</code> AND <code>2331 Phillips Rd, Tallahassee FL 32308</code></div>
+</div>
+
+<div class="sg-step s-em">
+  <div class="sg-stitle">📧 STEP 4: Monell Letters — All Agencies (Email Today)</div>
+  <div class="sg-body">ACLU: <code>info@aclufl.org</code> · DOJ: <code>askdoj@usdoj.gov</code> + civilrights.justice.gov portal<br>
+  FL AG: <code>citizen.services@myfloridalegal.com</code> · US Atty MDFL: <code>usaflm.atty@usdoj.gov</code> · IJ: ij.org/intake</div>
+</div>
+
+<div class="sg-step s-em">
+  <div class="sg-stitle">📧 STEP 5: Non-Response Notices — All 5 (Email + Cert Mail for LCSO + FDLE)</div>
+  <div class="sg-body">NR-LCSO, NR-FDLE, NR-Clerk, NR-DOJ, NR-ACLU — all dated March 4, 2026.</div>
+</div>
+
+<div class="sg-step s-ml">
+  <div class="sg-stitle">📬 STEP 6: Clerk Objection + Complaint (Certified Mail Only — No In-Person Without Attorney)</div>
+  <div class="sg-body">Both documents to: <code>1700 Monroe St, Fort Myers FL 33902</code> AND <code>1039 SE 9th Pl, Cape Coral FL 33993</code><br>
+  Every Clerk letter states: "This is a standalone Chapter 119 request — NOT tied to citation 26-051270, docket 26-TR-005517, or any court case."</div>
+</div>
+
+<div class="sg-step s-ip">
+  <div class="sg-stitle">🚶 STEP 7: San Carlos Park Businesses — IN PERSON OVERDUE (Cameras Overwrite ~30 Days)</div>
+  <div class="sg-body">BP Gas, Circle K, Larry's Pawn, Publix, Walgreens near Acorn Rd / Sanibel Rd. Hand-deliver with witness — have them sign your copy.</div>
+</div>
+
+<div class="sg-step s-em">
+  <div class="sg-stitle">📧 STEP 8: Apple Follow-Up + Attorney Outreach (Overdue — Email Today)</div>
+  <div class="sg-body">Apple: <code>legal@apple.com</code> — auto-response Feb 26, nothing since.<br>
+  Attorneys: John Bryan · De Novo Law / Harold Deon Thompson · Gary Kollin (754-295-3049) · William Powell (239-540-3333)</div>
+</div>
+</div>
+</div>
+
+<!-- GITHUB + SHEETS PANELS -->
+<div class="panels">
+<div class="panel gh">
+<div class="ph">⬡ GitHub — How to Update the Live Website</div>
+<div class="pstep">Your repository is: <strong>jriveralegal / case-file-</strong></div>
+<div class="pstep">Your live URL is: <strong>jriveralegal.github.io/case-file-</strong></div>
+<div class="pcode">https://jriveralegal.github.io/case-file-</div>
+<div class="pstep">1. Before downloading a new index.html — first DELETE the old index.html from your Downloads folder. This prevents Windows from saving it as "index (1).html".</div>
+<div class="pstep">2. Download the new index.html from Claude</div>
+<div class="pstep">3. Go to github.com/jriveralegal/case-file-</div>
+<div class="pstep">4. Click <strong>Add file → Upload files</strong></div>
+<div class="pstep">5. Drag and drop index.html onto the upload zone</div>
+<div class="pstep">6. Type commit message: <code>Update [date]</code></div>
+<div class="pstep">7. Click green <strong>Commit changes</strong></div>
+<div class="pstep">8. Wait 2–3 minutes → check the live URL above</div>
+<div class="pstep" style="color:#ff9999">⚠️ If site shows blank — it means GitHub Pages is looking for "index.html" but the file was uploaded as "index (4).html". Always check filename before uploading.</div>
+</div>
+<div class="panel gs">
+<div class="ph">📊 Google Sheets — How to Update Case Tracker</div>
+<div class="pstep"><strong>Option A — Import CSV:</strong></div>
+<div class="pstep">1. Open Rivera v LCSO Case Tracker in Google Sheets</div>
+<div class="pstep">2. File → Import → Upload → select RIVERA_StatusTracker_Paste.csv</div>
+<div class="pstep">3. Choose <strong>Replace current sheet</strong> → Import Data</div>
+<div class="pstep"><strong>Option B — Manual (when you send something):</strong></div>
+<div class="pstep">1. Find the document row</div>
+<div class="pstep">2. Column D (Date Sent) → today's date</div>
+<div class="pstep">3. Column E (Status) → <code>SENT</code></div>
+<div class="pstep">4. Column F (Cert Mail #) → tracking number</div>
+<div class="pstep"><strong>Columns:</strong> A=Group · B=ID · C=Title · D=Sent · E=Status · F=Cert# · G=Notes · H=Agency · I=Email · J=Deadline</div>
+</div>
+</div>
+
+<!-- CARL MILLER TRIBUTE -->
+<div class="cm-tribute" id="carl-miller">
+  <div class="cm-inner">
+    <div class="cm-stars">★ ★ ★</div>
+    <div class="cm-name">CARL MILLER</div>
+    <div class="cm-dates">1938 — 2014 · In Memoriam</div>
+    <div class="cm-quote">
+      "Your Constitution is an iron-clad contract, enforceable in a court of law.<br>
+      Learn it. Use it. It belongs to you."
+    </div>
+    <div class="cm-bio">
+      Vietnam War hero. Decorated veteran — shot down four times, shot twice, never stopped fighting.<br>
+      Spent 25 years teaching ordinary Americans how to use their own Constitution<br>
+      to defend their rights in court. The Sui Juris warrior.<br>
+      His teachings live in every motion filed, every demand letter sent,<br>
+      every citizen who stands up and says: <em style="color:rgba(201,168,76,.7)">"I know my rights."</em>
+    </div>
+    <div class="cm-tags">
+      <span class="cm-tag">Vietnam Veteran</span>
+      <span class="cm-tag">Constitutional Educator</span>
+      <span class="cm-tag">Sui Juris</span>
+      <span class="cm-tag">Patriot</span>
+      <span class="cm-tag">1938–2014</span>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <div class="foot-txt">Rivera v. Lee County Sheriff's Office · Case Portal · jriveralegal.github.io/case-file- · All documents dated March 4, 2026</div>
+</div>
+
+<script>
+// ─── DEADLINE CARDS DATA ──────────────────────────────────────────
+const DLS = [
+  {l:'🚨 Body Cam Purge',d:'2026-04-28',base:'critical',n:'8 LCSO cams deleted if not preserved. Fee waiver sent today.'},
+  {l:'San Carlos Cameras',d:'2026-02-27',base:'urgent',n:'~30-day retention. Likely OVERDUE. Go in person ASAP.'},
+  {l:'Apple Follow-Up',d:'2026-03-05',base:'urgent',n:'Auto-response Feb 26. No substantive reply. Overdue.'},
+  {l:'NR Notices',d:'2026-03-04',base:'urgent',n:'Non-response notices. Sending today.'},
+  {l:'Portal Deadline',d:'2026-03-14',base:'urgent',n:'10 days from LCSO portal email.'},
+  {l:'Keywords Deadline',d:'2026-03-18',base:'warning',n:'10 biz days from Mar 4 LCSO email.'},
+  {l:'FDLE Response Due',d:'2026-03-18',base:'warning',n:'10 biz days from FDLE combined letter.'},
+  {l:'SOL — §1983 Claim',d:'2028-01-28',base:'ok',n:'2 years from Jan 28, 2026 incident.'},
+];
+
+// ─── DOCUMENTS DATA ───────────────────────────────────────────────
+const DOCS = [
+{g:'A — LCSO Letters',id:'LR-4',urg:true,
+ title:'🚨 SEND FIRST — Body Cam Fee Waiver + Spoliation Warning (Reply to LCSO Part 3)',
+ desc:'8 body cams PURGE APRIL 28. Fee waiver: (1) litigation hold = independent preservation obligation; (2) public interest/DOJ review; (3) $144.73/hr exceeds §119.07(4) cap. Formal spoliation warning — destruction after litigation hold = Rule 37 sanctions + adverse inference. Video correction: LCSO deleted Rivera\'s own phone recording, NOT Hannah\'s.',
+ to:'records@sheriffleefl.org + ia@sheriffleefl.org',meth:'em+cm',
+ sent:'Mar 4, 2026',dl:'🚨 Apr 28 PURGE',dld:'2026-04-28',st:'send-now',
+ gm:{to:'records@sheriffleefl.org',su:'URGENT LR-4: Body Camera Fee Waiver + Spoliation Warning — Rivera — Jan 28 2026 — 8 Cams Purge April 28 2026',
+     bo:'Dear LCSO Records and Internal Affairs,\n\nATTACHED: Letter LR-4 of 5 — URGENT\n\nEight body cameras purge April 28. Litigation hold on file since Feb 25. Fee waiver requested. Spoliation warning issued.\n\nJoseph Anthony Rivera | (239) 220-9313 | davinchicoated@gmail.com'}},
+
+{g:'A — LCSO Letters',id:'LR-1',urg:false,
+ title:'Citation Discrepancy + Non-Acknowledgment (Pre-Portal Email — Sent Before Their 3-Part Email)',
+ desc:'Sent BEFORE receiving their 3-part email. Documents: (1) discrepancy between physical citation 26-051270 and court docket 26-TR-005517; (2) LCSO complete non-acknowledgment of Jan 28 civil rights incident. Establishes evasion was documented before portal response received.',
+ to:'records@sheriffleefl.org + ia@sheriffleefl.org',meth:'em+cm',
+ sent:'Mar 4, 2026',dl:'Mar 14',dld:'2026-03-14',st:'send-now',
+ gm:{to:'records@sheriffleefl.org',su:'LR-1: Citation Discrepancy Report + Non-Acknowledgment of Jan 28 Civil Rights Incident — Rivera — 26-051270 / 26-TR-005517',
+     bo:'Dear LCSO Records and Internal Affairs,\n\nAttached: Letter LR-1 of 5. Documents citation discrepancy (26-051270 vs 26-TR-005517) and formally establishes that LCSO\'s non-acknowledgment of the January 28, 2026 civil rights incident was documented before any portal response was received.\n\nJoseph Anthony Rivera | (239) 220-9313 | davinchicoated@gmail.com'}},
+
+{g:'A — LCSO Letters',id:'LR-2',urg:false,
+ title:'Reply to LCSO Part 1 — Portal Account Creation / Jan 28 Civil Rights Still Not Addressed',
+ desc:'Direct reply to their Part 1 portal email. Portal registration ≠ substantive response. LCSO used correct citation 26-051270 as header but answered wrong incident (Feb 8-9) in body. Demands separate tracking number for Jan 28 incident independent of any citation or court case.',
+ to:'records@sheriffleefl.org + ia@sheriffleefl.org',meth:'em+cm',
+ sent:'Mar 4, 2026',dl:'Mar 14',dld:'2026-03-14',st:'send-now',
+ gm:{to:'records@sheriffleefl.org',su:'LR-2: Reply to LCSO Portal Part 1 — Jan 28 Civil Rights Incident Still Not Acknowledged — Rivera',
+     bo:'Dear LCSO,\n\nAttached: Letter LR-2 of 5. Portal account acknowledged but does not constitute substantive response to the January 28, 2026 civil rights request.\n\nJoseph Anthony Rivera | davinchicoated@gmail.com'}},
+
+{g:'A — LCSO Letters',id:'LR-3',urg:false,
+ title:'Reply to LCSO Part 2 — Keywords Both Incidents + Fee Objection (Under Protest)',
+ desc:'Direct reply to their Part 2 keyword/fee email. Keywords for BOTH incidents under protest. References BOTH numbers: 26-051270 (physical) and 26-TR-005517 (court docket). Objects to $86.29/hr + $29.05/hr fees. NOT authorizing charges. CRITICAL CLARIFICATION: Chapter 119 NOT FOIA, NOT tied to citation or court case, do NOT forward to Clerk of Courts.',
+ to:'records@sheriffleefl.org',meth:'em',
+ sent:'Mar 4, 2026',dl:'Mar 18 (10 biz days)',dld:'2026-03-18',st:'send-now',
+ gm:{to:'records@sheriffleefl.org',su:'LR-3: Keywords Under Protest + Fee Objection — 26-051270 / 26-TR-005517 — Both Incidents — Chapter 119 NOT FOIA — Rivera',
+     bo:'Dear LCSO Records,\n\nAttached: Letter LR-3 of 5. Keywords provided under protest. Not authorizing charges. Fee challenge filed Feb 25 still unanswered. Chapter 119 — NOT FOIA — NOT tied to any citation or court case.\n\nJoseph Anthony Rivera | davinchicoated@gmail.com'}},
+
+{g:'A — LCSO Letters',id:'LR-5',urg:false,
+ title:'Objection to Merger — Demand Separate Requests — Chapter 119 NOT FOIA NOT Tied to Ticket',
+ desc:'Formal objection to merging Jan 28 civil rights request + Feb 8-9 CAD addendum into one cancellable tracking number. Full factual record for both incidents. CRITICAL: standalone Chapter 119 requests, NOT FOIA, NOT tied to citation 26-051270 or docket 26-TR-005517. Do NOT forward to Clerk of Courts.',
+ to:'records@sheriffleefl.org + ia@sheriffleefl.org',meth:'em+cm',
+ sent:'Mar 4, 2026',dl:'Mar 14',dld:'2026-03-14',st:'send-now',
+ gm:{to:'records@sheriffleefl.org',su:'LR-5: Objection to Merger — Chapter 119 Standalone Requests NOT FOIA NOT Tied to Citation or Court Case — Rivera',
+     bo:'Dear LCSO,\n\nAttached: Letter LR-5 of 5. Formal objection to merger. These are standalone Chapter 119 requests — NOT FOIA — NOT tied to citation 26-051270 or docket 26-TR-005517. Do NOT forward to or link with the Clerk of Courts.\n\nJoseph Anthony Rivera | davinchicoated@gmail.com'}},
+
+{g:'A — LCSO Letters',id:'LR-6',urg:false,
+ title:'GovQA Portal Activation Link Expired — Original Feb 25 Request Still Valid — Demand New Link + Email Confirmation',
+ desc:'LCSO told Rivera to "re-file" because the GovQA portal activation link expired. That instruction is LEGALLY WRONG. The request was valid the moment the stamped receipt was issued on Feb 25, 2026 under §119.07(1)(a). Re-filing would reset the response clock and erase 7 days of documented non-compliance. Demands: (1) new activation link sent to davinchicoated@gmail.com today; (2) written confirmation original request has NOT been reset or canceled; (3) all future comms also by email independent of portal; (4) statutory authority for re-file instruction if they insist. Incorporates portal demand into all LR-1 through LR-5 letters by reference. SEND LAST after all other letters.',
+ to:'records@sheriffleefl.org + ia@sheriffleefl.org',meth:'em+cm',
+ sent:'Mar 4, 2026',dl:'Response: 5 biz days',dld:'2026-03-11',st:'send-now',
+ gm:{to:'records@sheriffleefl.org',su:'LR-6: GovQA Portal Link Expired — Original Feb 25 Request Remains Valid — Demand New Activation Link + Written Confirmation — Rivera',
+     bo:'Dear LCSO Records Custodian and Internal Affairs,\n\nAttached: Letter LR-6 of 6.\n\nThe GovQA portal activation link sent to davinchicoated@gmail.com has expired. I have been advised to "re-file." That instruction is not authorized by Florida Chapter 119 and I formally reject it.\n\nMy records request was submitted in person on February 25, 2026 with a stamped receipt. It became legally operative at that moment under §119.07(1)(a). Portal account activation is not a prerequisite to a valid Chapter 119 request.\n\nDemands:\n1. Send a new GovQA activation link to davinchicoated@gmail.com today\n2. Confirm in writing the original Feb 25 request has NOT been reset or canceled\n3. Send all future correspondence by email to davinchicoated@gmail.com in addition to any portal communications\n4. If re-filing is required, provide the specific statutory authority under Chapter 119 within 5 business days\n\nThis letter also incorporates by reference the portal restoration demand into Letters LR-1 through LR-5 sent today.\n\nJoseph Anthony Rivera\n1435 SE 10th Ter, Cape Coral FL 33990\n(239) 220-9313 | davinchicoated@gmail.com'}},
+
+{g:'B — FDLE',id:'FDLE-C',urg:false,
+ title:'FDLE Combined — Escalation of Verbal Declination + Monell Pattern/Practice Supplement',
+ desc:'REPLACES previously mailed escalation letter. Now includes full Monell theory: Monell v. Dept. of Social Services (1978); 34 U.S.C. §12601; six LCSO pattern/custom failures (force policy, evidence deletion, body cam retention, Baker Act coercion, records obstruction, citation discrepancy). Escalates §943.1395 verbal declination from Feb 25.',
+ to:'FDLECivilRightsOffice@fdle.state.fl.us + OIG@fdle.state.fl.us',meth:'em+cm',
+ sent:'Mar 4, 2026',dl:'10 biz days',dld:'2026-03-18',st:'send-now',
+ gm:{to:'FDLECivilRightsOffice@fdle.state.fl.us',su:'Rivera v LCSO — Combined: §943.1395 Escalation + Monell Pattern Practice Supplement — Badge 22234 — Jan 28 2026',
+     bo:'Dear FDLE OEI,\n\nAttached: Combined submission — escalation of Feb 25 verbal declination (§943.1395) + Monell pattern/practice supplement. Certified mail to both Fort Myers and Tallahassee HQ.\n\nJoseph Anthony Rivera | (239) 220-9313 | davinchicoated@gmail.com'}},
+
+{g:'C — Monell Letters',id:'M-ACLU',title:'ACLU Florida — Pattern & Practice',
+ desc:'Requests representation or referral. Documents systemic LCSO pattern.',
+ to:'info@aclufl.org',meth:'em',sent:'Mar 4, 2026',dl:'',dld:'',st:'send-now',
+ gm:{to:'info@aclufl.org',su:'Rivera v LCSO — Civil Rights Pattern Practice — Representation/Referral Request',bo:'Joseph Anthony Rivera | davinchicoated@gmail.com | (239) 220-9313'}},
+{g:'C — Monell Letters',id:'M-DOJ',title:'DOJ — Enhanced Monell Supplement (34 USC §12601)',
+ desc:'Requests Special Litigation Section review under 34 U.S.C. §12601.',
+ to:'askdoj@usdoj.gov + civilrights.justice.gov',meth:'em',sent:'Mar 4, 2026',dl:'',dld:'',st:'send-now',
+ gm:{to:'askdoj@usdoj.gov',su:'34 USC 12601 Pattern Practice — Rivera v LCSO Lee County FL — Monell Supplement',bo:'Joseph Anthony Rivera | davinchicoated@gmail.com'}},
+{g:'C — Monell Letters',id:'M-AG',title:'Florida AG — Chapter 119 Obstruction + Pattern Practice',
+ desc:'Requests §119.11 enforcement + civil rights review.',
+ to:'citizen.services@myfloridalegal.com',meth:'em',sent:'Mar 4, 2026',dl:'',dld:'',st:'send-now',
+ gm:{to:'citizen.services@myfloridalegal.com',su:'Rivera v LCSO — Chapter 119 Obstruction + Civil Rights Pattern — AG Enforcement Request',bo:'Joseph Anthony Rivera | davinchicoated@gmail.com'}},
+{g:'C — Monell Letters',id:'M-USA',title:'US Attorney MDFL — §1983 Pattern Practice',
+ desc:'Monell supplement for federal §1983 pattern documentation.',
+ to:'usaflm.atty@usdoj.gov',meth:'em',sent:'Mar 4, 2026',dl:'',dld:'',st:'send-now',
+ gm:{to:'usaflm.atty@usdoj.gov',su:'Rivera v LCSO — Section 1983 Monell Pattern Practice — Lee County FL — Badge 22234',bo:'Joseph Anthony Rivera | davinchicoated@gmail.com'}},
+{g:'C — Monell Letters',id:'M-IJ',title:'Institute for Justice — Property Rights / Constitutional Issues',
+ desc:'IJ review request: warrantless search, property damage, evidence destruction.',
+ to:'ij.org/intake portal',meth:'po',sent:'Mar 4, 2026',dl:'',dld:'',st:'send-now'},
+
+{g:'D — Non-Response',id:'NR-1',title:'LCSO Non-Response Notice',
+ desc:'No substantive response since Feb 25, 2026 (6+ biz days). Demands written acknowledgment.',
+ to:'records@sheriffleefl.org + ia@sheriffleefl.org',meth:'em+cm',
+ sent:'Mar 4, 2026',dl:'Overdue since Mar 4',dld:'2026-03-04',st:'send-now',
+ gm:{to:'records@sheriffleefl.org',su:'Non-Response Notice — Rivera — No Substantive Reply Since Feb 25 2026',bo:'Joseph Anthony Rivera | davinchicoated@gmail.com'}},
+{g:'D — Non-Response',id:'NR-2',title:'FDLE Non-Response Notice',
+ desc:'No written response to Feb 25 complaint despite stamped receipt + officer signature.',
+ to:'FDLECivilRightsOffice@fdle.state.fl.us',meth:'em+cm',
+ sent:'Mar 4, 2026',dl:'Overdue',dld:'2026-03-04',st:'send-now',
+ gm:{to:'FDLECivilRightsOffice@fdle.state.fl.us',su:'Non-Response Notice — Rivera v LCSO FDLE — No Written Response Since Feb 25 2026',bo:'Joseph Anthony Rivera | davinchicoated@gmail.com'}},
+{g:'D — Non-Response',id:'NR-3',title:'Clerk Non-Response Notice',
+ desc:'No written response since T-167 (Feb 25) + CM-112 (Feb 26). Certified mail only.',
+ to:'Cert mail: 1700 Monroe St FM + 1039 SE 9th Pl CC',meth:'cm',
+ sent:'Mar 4, 2026',dl:'Overdue',dld:'2026-03-04',st:'send-now'},
+{g:'D — Non-Response',id:'NR-4',title:'DOJ Non-Response Notice',
+ desc:'No acknowledgment since Feb 25-26 portal submission.',
+ to:'askdoj@usdoj.gov',meth:'em',sent:'Mar 4, 2026',dl:'',dld:'',st:'send-now',
+ gm:{to:'askdoj@usdoj.gov',su:'Non-Response — Rivera v LCSO DOJ Submission — No Acknowledgment Since Feb 25-26 2026',bo:'Joseph Anthony Rivera | davinchicoated@gmail.com'}},
+{g:'D — Non-Response',id:'NR-5',title:'ACLU Non-Response Notice',
+ desc:'No intake acknowledgment since Feb 26.',
+ to:'info@aclufl.org',meth:'em',sent:'Mar 4, 2026',dl:'',dld:'',st:'send-now',
+ gm:{to:'info@aclufl.org',su:'Non-Response — Rivera v LCSO ACLU Intake — No Response Since Feb 26 2026',bo:'Joseph Anthony Rivera | davinchicoated@gmail.com'}},
+
+{g:'E — Clerk of Courts',id:'CLK-1',title:'Clerk Objection — Chapter 119 Misapplication (with Case Law)',
+ desc:'EVERY Clerk letter states: "Standalone Chapter 119 request — NOT tied to citation 26-051270, docket 26-TR-005517, or any court case." Certified mail only — no in-person without attorney.',
+ to:'Cert mail: 1700 Monroe St FM + 1039 SE 9th Pl CC',meth:'cm',
+ sent:'Mar 4, 2026',dl:'',dld:'',st:'send-now'},
+{g:'E — Clerk of Courts',id:'CLK-2',title:'Clerk Formal Complaint — Records Obstruction (with Case Law)',
+ desc:'Documents inter-office discussion, verbal obstruction, failure to provide written denial under §119.07(1)(c). Same Chapter 119 standalone clarification.',
+ to:'Cert mail: 1700 Monroe St FM + 1039 SE 9th Pl CC',meth:'cm',
+ sent:'Mar 4, 2026',dl:'',dld:'',st:'send-now'},
+
+{g:'F — Attorney Outreach',id:'ATT-1',title:'John Bryan — Civil Rights Attorney',
+ desc:'Attach master case file PDF.',to:'floridabar.org for contact',meth:'em',sent:'Mar 4, 2026',dl:'',dld:'',st:'send-now'},
+{g:'F — Attorney Outreach',id:'ATT-2',title:'De Novo Law / Harold Deon Thompson',
+ desc:'Attach master case file PDF.',to:'denovolaw.com',meth:'em',sent:'Mar 4, 2026',dl:'',dld:'',st:'send-now'},
+{g:'F — Attorney Outreach',id:'ATT-3',title:'Gary Kollin + William Powell',
+ desc:'Gary Kollin: 754-295-3049 garykollinlaw.com | William Powell (Cape Coral): 239-540-3333',
+ to:'garykollinlaw.com | (239) 540-3333',meth:'em',sent:'Mar 4, 2026',dl:'',dld:'',st:'send-now'},
+
+{g:'G — Apple',id:'APL-1',title:'Apple Legal Follow-Up — Both iCloud Accounts',
+ desc:'Auto-response received Feb 26. No substantive reply — OVERDUE. copyproxy88@icloud.com + luvdontlivecold@icloud.com.',
+ to:'legal@apple.com',meth:'em',sent:'Mar 4, 2026',dl:'Overdue — was Mar 5',dld:'2026-03-05',st:'send-now',
+ gm:{to:'legal@apple.com',su:'Follow-Up: Rivera iCloud Litigation Hold — Original Feb 26 — No Substantive Confirmation',bo:'Joseph Anthony Rivera | (239) 220-9313 | davinchicoated@gmail.com'}},
+{g:'G — Apple',id:'APL-2',title:'Apple Privacy Team Follow-Up',
+ desc:'Follow up via privacy.apple.com portal for both accounts.',
+ to:'privacy.apple.com portal',meth:'po',sent:'Mar 4, 2026',dl:'Overdue',dld:'2026-03-05',st:'send-now'},
+
+{g:'H — San Carlos Park',id:'SCP-1',title:'BP Gas Station — Preservation Demand (OVERDUE)',
+ desc:'Near Acorn Rd / Sanibel Rd Jan 28 stop location. ~30-day retention likely expired.',
+ to:'In-person — ask for manager, have them sign copy',meth:'ip',
+ sent:'Mar 4, 2026',dl:'OVERDUE — cameras overwrite',dld:'2026-02-27',st:'send-now'},
+{g:'H — San Carlos Park',id:'SCP-2',title:'Circle K — Preservation Demand (OVERDUE)',
+ desc:'Near Jan 28 stop.',to:'In-person',meth:'ip',sent:'Mar 4, 2026',dl:'OVERDUE',dld:'2026-02-27',st:'send-now'},
+{g:'H — San Carlos Park',id:'SCP-3',title:"Larry's Pawn — Preservation Demand (OVERDUE)",
+ desc:'Near Jan 28 stop.',to:'In-person',meth:'ip',sent:'Mar 4, 2026',dl:'OVERDUE',dld:'2026-02-27',st:'send-now'},
+{g:'H — San Carlos Park',id:'SCP-4',title:'Publix — Preservation Demand (OVERDUE)',
+ desc:'Near Jan 28 stop.',to:'In-person — ask for loss prevention',meth:'ip',sent:'Mar 4, 2026',dl:'OVERDUE',dld:'2026-02-27',st:'send-now'},
+{g:'H — San Carlos Park',id:'SCP-5',title:'Walgreens — Preservation Demand (OVERDUE)',
+ desc:'Near Jan 28 stop.',to:'In-person — ask for manager',meth:'ip',sent:'Mar 4, 2026',dl:'OVERDUE',dld:'2026-02-27',st:'send-now'},
+
+// CONFIRMED SENT
+{g:'✅ Confirmed Sent',id:'S-1',title:'LCSO Records Request + Litigation Hold + Fee Challenge',
+ desc:'In person Feb 25, 2026. Stamped receipt. Citation 26-051270, Deputy Rogers Badge 22234.',
+ to:'14750 Six Mile Cypress Pkwy',meth:'ip',sent:'Feb 25, 2026',dl:'Active',dld:'',st:'sent'},
+{g:'✅ Confirmed Sent',id:'S-2',title:'FDLE Complaint',
+ desc:'In person Feb 25, 2026. Stamped receipt + officer signature. Verbal declination escalated via FDLE-C above.',
+ to:'2295 Victoria Ave Fort Myers',meth:'ip',sent:'Feb 25, 2026',dl:'Active',dld:'',st:'sent'},
+{g:'✅ Confirmed Sent',id:'S-3',title:'Clerk Records Request — Service Ticket T-167',
+ desc:'Feb 25, 2026. Improperly tied to closed case — objection/complaint going via cert mail today.',
+ to:'1700 Monroe St Fort Myers',meth:'ip',sent:'Feb 25, 2026',dl:'Active',dld:'',st:'sent'},
+{g:'✅ Confirmed Sent',id:'S-4',title:'Ross + Five Below + Plaza Preservation Demands',
+ desc:'Hand-delivered Feb 25, 2026. Stamped receipts on file.',
+ to:'On-site',meth:'ip',sent:'Feb 25, 2026',dl:'Active',dld:'',st:'sent'},
+{g:'✅ Confirmed Sent',id:'S-5',title:'Spios Dental Preservation Demand',
+ desc:'Hand-delivered Feb 25, 2026. Near Jan 28 stop on Sanibel Rd.',
+ to:'On-site',meth:'ip',sent:'Feb 25, 2026',dl:'Active',dld:'',st:'sent'},
+{g:'✅ Confirmed Sent',id:'S-6',title:'LCSO CAD Addendum (Feb 8-9 Incident)',
+ desc:'In person Feb 26, 2026. Stamped receipt. Dispatch logs, body cam, chain of custody for phone.',
+ to:'14750 Six Mile Cypress Pkwy',meth:'ip',sent:'Feb 26, 2026',dl:'Active',dld:'',st:'sent'},
+{g:'✅ Confirmed Sent',id:'S-7',title:'Clerk CM-112 Service Ticket',
+ desc:'Feb 26, 2026. Clerk wrote 26-TR-005517, verbally said 26-051270 was "wrong."',
+ to:'1700 Monroe St Fort Myers',meth:'ip',sent:'Feb 26, 2026',dl:'Active',dld:'',st:'sent'},
+{g:'✅ Confirmed Sent',id:'S-8',title:'Apple Legal + Privacy Emails',
+ desc:'Email Feb 26, 2026. Auto-response received. Follow-up in Group G.',
+ to:'legal@apple.com + privacy.apple.com',meth:'em',sent:'Feb 26, 2026',dl:'Follow-up overdue',dld:'2026-03-05',st:'sent'},
+{g:'✅ Confirmed Sent',id:'S-9',title:'DOJ + ACLU Portal Submissions',
+ desc:'Feb 25-26, 2026. Non-response notices in Group D.',
+ to:'Online portals',meth:'po',sent:'Feb 25-26, 2026',dl:'Active',dld:'',st:'sent'},
+{g:'✅ Confirmed Sent',id:'S-10',title:'FDLE Escalation Letter (Earlier Version — No Monell)',
+ desc:'Mailed previously. Did NOT include Monell content. Superseded by FDLE-C which adds full Monell supplement.',
+ to:'2295 Victoria Ave + 2331 Phillips Rd',meth:'cm',sent:'~Mar 2-4, 2026',dl:'Superseded by FDLE-C',dld:'',st:'sent'},
+{g:'✅ Confirmed Sent',id:'S-11',title:'Non-Response Notices (March 2, 2026)',
+ desc:'NR notices emailed March 2, 2026 to LCSO, FDLE, Clerk, DOJ, ACLU. Updated versions going out today.',
+ to:'All agencies email',meth:'em',sent:'Mar 2, 2026',dl:'Active',dld:'',st:'sent'},
+
+// EVIDENCE
+{g:'🔒 Evidence',id:'EV-1',title:"Hannah's Video 1 (Hannah's Phone — SAFE in Google Drive)",
+ desc:"Passenger Hannah's recording on HER phone. Shows Rivera on ground with all 4 LCSO deputies. PRIMARY use-of-force evidence.",
+ to:'Google Drive',meth:'pr',sent:'Jan 28, 2026',dl:'Preserved',dld:'',st:'ev'},
+{g:'🔒 Evidence',id:'EV-2',title:"Hannah's Video 2 (Hannah's Phone — SAFE in Google Drive)",
+ desc:"Second clip from Hannah's phone. Safe in Google Drive.",
+ to:'Google Drive',meth:'pr',sent:'Jan 28, 2026',dl:'Preserved',dld:'',st:'ev'},
+{g:'🔒 Evidence',id:'EV-3',title:"⚠️ Rivera's Phone Recording — DELETED BY LCSO OFFICER",
+ desc:"Video recording Rivera made on HIS OWN PHONE was deleted by an LCSO officer during the Jan 28 stop. First Amendment violation: Smith v. Cumming, 212 F.3d 1332 (11th Cir. 2000). Body cameras should show the deletion. Hannah's videos are unaffected — they are on Hannah's phone.",
+ to:'Deleted — body cam footage may show deletion act',meth:'po',sent:'Deleted Jan 28',dl:'Document in all letters',dld:'',st:'ev'},
+{g:'🔒 Evidence',id:'EV-4',title:'Vehicle Damage Photos — PHOTOGRAPH TODAY',
+ desc:'Broken door panels, broken cup holder, razor slash marks on driver\'s seat from warrantless search. Photograph each with ruler for scale. Upload to Google Drive.',
+ to:'Photograph today',meth:'po',sent:'Pending',dl:'TODAY',dld:'2026-03-04',st:'ev'},
+{g:'🔒 Evidence',id:'EV-5',title:'Physical Citation #26-051270 + Clerk Tickets T-167 / CM-112',
+ desc:'26-051270 = physical ticket from Rogers. 26-TR-005517 = court system. T-167 Feb 25. CM-112 Feb 26 (Clerk wrote alternate number). Keep all originals.',
+ to:'Secure storage',meth:'pr',sent:'On file',dl:'Preserve',dld:'',st:'ev'},
+{g:'🔒 Evidence',id:'EV-6',title:'FDLE Stamped Receipt — Officer Signature (Feb 25)',
+ desc:'Proves complaint was submitted and received. Keep original.',
+ to:'Secure storage',meth:'pr',sent:'Feb 25, 2026',dl:'Preserve',dld:'',st:'ev'},
+{g:'🔒 Evidence',id:'EV-7',title:'🚨 8 Body Cameras — PURGE APRIL 28, 2026',
+ desc:'8 LCSO body cameras from January 28 stop. Litigation hold on file since Feb 25. Fee waiver sent today. Spoliation warning issued. Must not be purged.',
+ to:'LCSO — fee waiver pending',meth:'po',sent:'Pending',dl:'PURGE APRIL 28',dld:'2026-04-28',st:'ev'},
+{g:'🔒 Evidence',id:'EV-8',title:'Apple iCloud Data — Both Accounts',
+ desc:'copyproxy88@icloud.com + luvdontlivecold@icloud.com. Litigation hold sent Feb 26. Follow-up today.',
+ to:'Apple Legal',meth:'po',sent:'Feb 26, 2026',dl:'Follow-up today',dld:'2026-03-04',st:'ev'},
+];
+
+// ─── TIMER LOGIC ─────────────────────────────────────────────────
+function diffInfo(dld){
+  if(!dld) return null;
+  const diff = new Date(dld) - new Date();
+  const days = diff / 864e5;
+  const absDays = Math.abs(days);
+  const d = Math.floor(Math.abs(diff)/864e5);
+  const h = Math.floor((Math.abs(diff)%864e5)/36e5);
+  const m = Math.floor((Math.abs(diff)%36e5)/6e4);
+  const s = Math.floor((Math.abs(diff)%6e4)/1e3);
+  return {diff, days, absDays, d, h, m, s, past: diff < 0};
+}
+
+function timerText(dld){
+  const i = diffInfo(dld);
+  if(!i) return '';
+  if(i.past) return `PAST DUE ${i.d}d ${i.h}h ${i.m}m ago`;
+  if(i.d===0) return `${i.h}h ${i.m}m ${i.s}s`;
+  return `${i.d}d ${i.h}h ${i.m}m`;
+}
+
+function timerClass(dld){
+  const i = diffInfo(dld);
+  if(!i) return 'ok';
+  if(!i.past) return i.days < 7 ? 'near' : 'ok';
+  // past due — intensity by how long
+  if(i.absDays > 7) return 'over7';   // multi-color flash
+  if(i.absDays > 3) return 'over3';   // fast flash
+  return 'over1';                      // steady red
+}
+
+function ddCardClass(base, dld){
+  const i = diffInfo(dld);
+  if(!i || !i.past) return base;
+  if(i.absDays > 3) return 'alarm';
+  if(i.absDays > 1) return 'superurg';
+  return 'overdue';
+}
+
+// ─── BUILD DEADLINE CARDS ────────────────────────────────────────
+function buildDD(){
+  const g = document.getElementById('ddg');
+  DLS.forEach(d => {
+    const div = document.createElement('div');
+    div.className = 'ddc '+ddCardClass(d.base, d.d);
+    div.dataset.dld = d.d;
+    div.dataset.base = d.base;
+    div.innerHTML = `<div class="dd-dlbl">${d.l}</div>
+      <div class="dd-ddate" data-ddate="${d.d}">${d.d}</div>
+      <div class="dd-dtimer" data-dt="${d.d}">…</div>
+      <div class="dd-dnote">${d.n}</div>`;
+    g.appendChild(div);
+  });
+}
+
+// ─── HEADER CLOCKS ───────────────────────────────────────────────
+function tickHeader(){
+  [['sol','2028-01-28'],['purge','2026-04-28'],['kw','2026-03-18'],['portal','2026-03-14']].forEach(([id,d])=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    const info = diffInfo(d);
+    if(!info) return;
+    if(info.past){
+      el.textContent = `PAST DUE ${info.d}d ${info.h}h ago`;
+      el.classList.add('pd');
+    } else {
+      el.textContent = info.d===0 ? `${info.h}h ${info.m}m ${info.s}s` : `${info.d}d ${info.h}h ${info.m}m`;
+      if(info.days < 7) el.classList.add('near');
+    }
+  });
+}
+
+// ─── TICK ALL ────────────────────────────────────────────────────
+function tickAll(){
+  tickHeader();
+  // deadline card timers + classes
+  document.querySelectorAll('[data-dt]').forEach(el=>{
+    el.textContent = timerText(el.dataset.dt);
+  });
+  document.querySelectorAll('.ddc[data-dld]').forEach(div=>{
+    const cls = ddCardClass(div.dataset.base, div.dataset.dld);
+    div.className = 'ddc '+cls;
+  });
+  // row timers
+  document.querySelectorAll('.dtmr[data-dld]').forEach(el=>{
+    el.textContent = timerText(el.dataset.dld);
+    el.className = 'dtmr '+timerClass(el.dataset.dld);
+  });
+  // row alarm classes
+  document.querySelectorAll('.dr[data-dld]').forEach(row=>{
+    const dld = row.dataset.dld;
+    if(!dld||row.dataset.st==='sent'||row.dataset.st==='ev') return;
+    const i = diffInfo(dld);
+    if(!i||!i.past) return;
+    row.classList.remove('alarm-row','superurg-row');
+    if(i.absDays > 3) row.classList.add('alarm-row');
+    else if(i.absDays > 1) row.classList.add('superurg-row');
+  });
+}
+setInterval(tickAll, 1000);
+tickAll();
+
+// ─── BADGE HTML ──────────────────────────────────────────────────
+function badges(m){
+  const map={em:'<span class="badge em">EMAIL</span>',cm:'<span class="badge cm">CERT MAIL</span>',
+    ip:'<span class="badge ip">IN PERSON</span>',po:'<span class="badge po">PORTAL</span>',
+    pr:'<span class="badge pr">SECURED</span>'};
+  return (m||'').split('+').map(x=>map[x.trim()]||'').join(' ');
+}
+
+function pillHTML(d, isSent){
+  if(isSent && d.st!=='sent') return '<span class="pill p-sent">✅ SENT</span>';
+  if(d.st==='sent') return '<span class="pill p-sent">✅ SENT</span>';
+  if(d.st==='ev') return '<span class="pill p-ev">EVIDENCE</span>';
+  if(d.urg) return '<span class="pill p-urg">🚨 SEND FIRST</span>';
+  return '<span class="pill p-now">SEND TODAY</span>';
+}
+
+function gmailURL(gm){
+  return 'https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(gm.to)+'&su='+encodeURIComponent(gm.su)+'&body='+encodeURIComponent(gm.bo);
+}
+
+// ─── BUILD TABLE ─────────────────────────────────────────────────
+function buildTable(){
+  const tb = document.getElementById('tb');
+  DOCS.forEach((d,i)=>{
+    const key = 'sv3_'+i;
+    const isSent = !!(localStorage&&localStorage.getItem(key));
+    const rowCls = d.urg?'urg-row':d.st==='sent'?'sent-row':d.st==='ev'?'ev-row':'send-row';
+    const timerHtml = d.dld ? `<div class="dtmr" data-dld="${d.dld}">…</div>` : '';
+
+    let acts = '<div class="acts">';
+    if(d.gm && d.st!=='sent' && d.st!=='ev')
+      acts += `<a class="ab gm" href="${gmailURL(d.gm)}" target="_blank">📧 Gmail</a>`;
+    if(d.meth&&(d.meth.includes('cm')||d.meth.includes('ip')))
+      acts += `<button class="ab pr" onclick="window.print()">🖨️ Print</button>`;
+    if(d.st!=='sent'&&d.st!=='ev'){
+      if(isSent) acts += `<span class="ab sl">✅ Sent</span>`;
+      else acts += `<button class="ab ms" onclick="markSent(${i},'${key}',this)">✓ Mark Sent</button>`;
+    }
+    acts += '</div>';
+
+    tb.innerHTML += `<tr class="dr ${rowCls}" data-st="${d.st}" data-meth="${d.meth||''}" data-dld="${d.dld||''}" data-txt="${d.title} ${d.g} ${d.desc}">
+      <td><div class="cgrp">${d.g}</div><div class="cid">${d.id}</div></td>
+      <td><div class="dtitle">${d.title}</div><div class="ddesc">${d.desc}</div>${badges(d.meth)}</td>
+      <td><div class="crow"><span class="clbl">TO</span>${d.to}</div></td>
+      <td class="dc"><div class="ds">${d.sent}</div><div class="dl">Deadline</div><div class="dv">${d.dl||'—'}</div>${timerHtml}</td>
+      <td>${pillHTML(d,isSent)}</td>
+      <td>${acts}</td>
+    </tr>`;
+  });
+}
+
+function markSent(i,key,btn){
+  if(localStorage)localStorage.setItem(key,new Date().toISOString());
+  btn.className='ab sl';btn.textContent='✅ Sent';
+  const row=btn.closest('tr');
+  row.querySelectorAll('td').forEach(td=>td.style.opacity='.7');
+  const p=row.querySelector('.pill');
+  if(p)p.outerHTML='<span class="pill p-sent">✅ SENT</span>';
+}
+
+let curF='all';
+function filt(f,btn){
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  curF=f;applyF();
+}
+function applyF(){
+  const q=document.getElementById('srch').value.toLowerCase();
+  document.querySelectorAll('.dr').forEach(r=>{
+    const s=r.dataset.st,m=r.dataset.meth||'',txt=r.dataset.txt.toLowerCase();
+    const mQ=!q||txt.includes(q);
+    const mF=curF==='all'||(curF==='send-now'&&s!=='sent'&&s!=='ev')||
+      (curF==='sent'&&s==='sent')||(curF==='ev'&&s==='ev')||
+      (curF==='email'&&m.includes('em'))||(curF==='mail'&&(m.includes('cm')||m.includes('ip')));
+    r.classList.toggle('hidden',!(mQ&&mF));
+  });
+}
+document.getElementById('srch').addEventListener('input',applyF);
+
+buildDD();buildTable();
+</script>
+</body>
+</html>
